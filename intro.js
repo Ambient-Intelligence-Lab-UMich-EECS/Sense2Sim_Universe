@@ -45,6 +45,7 @@
   function easeIO(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
   function mix(a, b, f) { return a + (b - a) * f; }
   function rng(seed) { var a = seed >>> 0; return function () { a = (a + 0x6d2b79f5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function hash2(a, b) { var h = Math.imul((a | 0) ^ Math.imul((b | 0) + 0x9e3779b9, 0x85ebca6b), 0xc2b2ae35); h ^= h >>> 15; h = Math.imul(h, 0x27d4eb2f); h ^= h >>> 13; return (h >>> 0) / 4294967296; }
   function hex(c) { return [parseInt(c.slice(1, 3), 16) / 255, parseInt(c.slice(3, 5), 16) / 255, parseInt(c.slice(5, 7), 16) / 255]; }
 
   // the story's parts along the scroll (0..1)
@@ -58,6 +59,9 @@
   var MODS = DATA.mods, COUNTS = DATA.counts, HEROES = DATA.heroes || [];
   var N = 0, OFF = [];
   COUNTS.forEach(function (n) { OFF.push(N); N += n; });
+  // the sheets that carry their real title ([paper, title, venue, authors]) and each paper's short name
+  var TITLED = (DATA.titled || []).filter(function (t) { return t && t[0] >= 0 && t[0] < N && t[1]; });
+  var NAMES = DATA.names || [];
   var colNight = new Float32Array(21), colSheet = new Float32Array(21);
   for (var gi = 0; gi < 7; gi++) {
     colNight.set(hex(MOD_NIGHT[MODS[gi]] || "#9ba8bb"), gi * 3);
@@ -105,6 +109,8 @@
     cells.length = N;
     var heroOf = new Int16Array(N).fill(-1), order = [], taken = {};
     HEROES.forEach(function (h, j) { var k = OFF[h.g] + h.i; if (k >= 0 && k < N && !taken[k]) { taken[k] = 1; heroOf[k] = j; order.push(k); } });
+    // (then the sheets with a real title, round them: 100 and up)
+    TITLED.forEach(function (t, j) { var k = t[0]; if (!taken[k]) { taken[k] = 1; heroOf[k] = 100 + j; order.push(k); } });
     var rest = []; for (var k = 0; k < N; k++) if (!taken[k]) rest.push(k);
     var R = rng(77); for (var i = rest.length - 1; i > 0; i--) { var j2 = Math.floor(R() * (i + 1)), t = rest[i]; rest[i] = rest[j2]; rest[j2] = t; }
     order = order.concat(rest);
@@ -265,7 +271,7 @@
       var g = 0; while (g < 6 && k >= OFF[g] + COUNTS[g]) g++;
       var h1 = R(), h2 = R(), h3 = R(), h4 = R(), near = cell.d < 1.6;
       // 0 star (written by writeStars) · 2 wall · 5 world · 8 four numbers · 12 kind, child, when it flies, star size · 16 named sheet, ring, tilt
-      buf[o + 2] = cell.dx * PX + (near ? 0 : (HH[k] - 0.5) * 0.08); buf[o + 3] = -cell.dy * PY + (near ? 0 : (HZ[k] - 0.5) * 0.08); buf[o + 4] = near ? 0 : -6 * HZ[k];
+      buf[o + 2] = cell.dx * PX + (near ? 0 : (HH[k] - 0.5) * 0.08); buf[o + 3] = -cell.dy * PY + (near ? 0 : (HZ[k] - 0.5) * 0.08); buf[o + 4] = near ? 0 : hero >= 0 ? -0.45 * HZ[k] : -0.6 - 5.4 * HZ[k];
       var w = toWorld[m] * 3; buf[o + 5] = world[w]; buf[o + 6] = world[w + 1]; buf[o + 7] = world[w + 2];
       buf[o + 8] = h1; buf[o + 9] = h2; buf[o + 10] = ch ? h3 : HH[k]; buf[o + 11] = h4;
       buf[o + 12] = g; buf[o + 13] = ch; buf[o + 14] = (0.5 * cell.d) / wall.maxD + 0.08 * HH[k]; buf[o + 15] = 4.2 + 6.5 * HZ[k];
@@ -275,6 +281,24 @@
   function writeStars(portrait) {
     starsNow = layoutStars(portrait); portraitNow = portrait;
     for (var m = 0; m < M; m++) { var k = m % N, o = m * STRIDE; buf[o] = starsNow.pos[k * 2]; buf[o + 1] = starsNow.pos[k * 2 + 1]; }
+    slotLists();
+  }
+  // the names shown by the stars: twelve labels, each with a part of one galaxy to itself (the galaxy cut like a
+  // cake into as many parts as it has labels; not its heart, where the stars crowd, nor above its own name)
+  var SLOTS = 12, SLOT_GAL = [0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 0, 0], slotStars = [];
+  function slotLists() {
+    var S = starsNow, per = [0, 0, 0, 0, 0, 0, 0], nth = [];
+    SLOT_GAL.forEach(function (g) { nth.push(per[g]++); });
+    slotStars = SLOT_GAL.map(function (g, j) {
+      var q = S.gal[g], out = [];
+      for (var i = 0; i < COUNTS[g]; i++) {
+        var k = OFF[g] + i; if (!NAMES[k]) continue;
+        var dx = S.pos[k * 2] - q.x, dy = (S.pos[k * 2 + 1] - q.y) / 0.78, r = Math.hypot(dx, dy);
+        if (r < 0.3 * q.R || (dy > 0.55 * q.R && Math.abs(dx) < 0.6 * q.R)) continue;
+        if (Math.min(per[g] - 1, Math.floor(((Math.atan2(dy, dx) + Math.PI) / TAU) * per[g])) === nth[j]) out.push(k);
+      }
+      return out;
+    });
   }
 
   // ---------------------------------------------------------------- the named papers' first pages, drawn once
@@ -314,27 +338,94 @@
       wrapText(g, au.map(function (a) { return a[0]; }).join(", "), 800 * u).slice(0, 3).forEach(function (ln) { g.fillText(ln, cx, y + 20 * u); y += 29 * u; });
       y += 8 * u;
     }
-    // the two columns
-    var top = Math.max(y + 34 * u, y0 + 0.262 * h), bottom = y0 + 0.932 * h, pitch = 0.0212 * h, th = 0.0093 * h;
-    var cols = [[x0 + 90 * u, x0 + 470 * u], [x0 + 530 * u, x0 + 910 * u]];
-    function head(c, yy, words) { g.textAlign = "left"; g.fillStyle = "#1d2025"; g.font = "700 " + 15 * u + "px " + SANS; g.fillText(words, cols[c][0], yy + pitch * 0.62); return yy + pitch * 1.25; }
-    function bars(c, yy, to) {
-      g.fillStyle = "#c9cbcf";
-      while (yy + th < to) { var end = R() > 0.87; g.fillRect(cols[c][0], yy + pitch * 0.2, (cols[c][1] - cols[c][0]) * (end ? 0.3 + 0.5 * R() : 1), th); yy += pitch * (end ? 1.9 : 1); }
+    // the two columns, set as a conference paper's first page is: an abstract, the concepts and keywords, the
+    // reference line, the introduction and the note at the left column's foot; a figure and its caption, then
+    // text, on the right. The text is no paper's: each line is drawn as words' shapes, justified, a paragraph's
+    // first line set in and its last one short.
+    var top = Math.max(y + 30 * u, y0 + 0.262 * h), bottom = y0 + 0.936 * h, pitch = 0.0159 * h, xh = pitch * 0.35;
+    var cols = [[x0 + 85 * u, x0 + 475 * u], [x0 + 525 * u, x0 + 915 * u]];
+    function head(c, yy, words) { g.textAlign = "left"; g.fillStyle = "#1d2025"; g.font = "700 " + 14.5 * u + "px " + SANS; g.fillText(words, cols[c][0], yy + pitch * 0.74); return yy + pitch * 1.3; }
+    function words(c, yy, to, lines, ink) {
+      var xa = cols[c][0], xb = cols[c][1], sp0 = 3.8 * u, lp = 4.5 * u, lw = 3.7 * u, left = 2 + Math.floor(R() * 9), indent = false, n = 0;
+      g.fillStyle = ink || "#55585e"; g.globalAlpha = 0.8;
+      while (yy + pitch <= to && (!lines || n < lines)) {
+        var last = left <= 0 || (lines && n === lines - 1), x = xa + (indent ? 15 * u : 0), end = last ? xa + (xb - xa) * (0.25 + 0.6 * R()) : xb;
+        var ws = [], tot = 0;
+        for (;;) { var nl = 1 + Math.floor(R() * R() * 9 + R() * 2.4), fits = tot + nl * lp <= end - x; if (!fits) nl = Math.floor((end - x - tot) / lp); if (nl >= 1) { ws.push(nl); tot += nl * lp + sp0; } if (!fits) break; }
+        var inkW = tot - ws.length * sp0, sp = last || ws.length < 2 ? sp0 : (end - x - inkW) / (ws.length - 1);
+        // (a word is its letters' shapes: most as high as an x, some taller, a few hanging below the line)
+        for (var q = 0; q < ws.length; q++) {
+          for (var l = 0; l < ws[q]; l++) { var kind = R(), up = kind < 0.24 ? xh * 0.42 : 0, dn = kind > 0.9 ? xh * 0.36 : 0; g.fillRect(x + l * lp, yy + pitch * 0.32 - up, lw, xh + up + dn); }
+          x += ws[q] * lp + sp;
+        }
+        yy += pitch; n++; indent = last; left = last ? 2 + Math.floor(R() * 9) : left - 1;
+      }
+      g.globalAlpha = 1;
       return yy;
     }
-    var yl = head(0, top, "ABSTRACT"); yl = bars(0, yl, top + (bottom - top) * 0.44); yl = head(0, yl + pitch * 0.6, "1   INTRODUCTION"); bars(0, yl, bottom);
-    var fh = 0.17 * h, fx = cols[1][0], fw = cols[1][1] - cols[1][0];
-    g.fillStyle = tint; g.globalAlpha = 0.1; g.fillRect(fx, top, fw, fh); g.globalAlpha = 0.55; g.strokeStyle = tint; g.lineWidth = 1.5 * u; g.strokeRect(fx, top, fw, fh);
+    var footTop = bottom - pitch * 5.4;
+    // (a part only where a heading and two lines still stand above `to`)
+    function part(c, yy, gap, title, to, lines, ink) { yy += pitch * gap; return yy + pitch * 3.4 > to ? yy - pitch * gap : words(c, head(c, yy, title), to, lines, ink); }
+    var yl = words(0, head(0, top, "ABSTRACT"), top + (footTop - top) * 0.36);
+    yl = part(0, yl, 0.5, "CCS CONCEPTS", footTop, 3);
+    yl = part(0, yl, 0.5, "KEYWORDS", footTop, 2);
+    yl = part(0, yl, 0.5, "ACM Reference Format:", footTop, 4, "#73767c");
+    part(0, yl, 0.7, "1   INTRODUCTION", footTop - pitch * 0.4);
+    g.fillStyle = "#8a8d93"; g.fillRect(cols[0][0], footTop + pitch * 0.2, 150 * u, Math.max(1, 1.2 * u));
+    words(0, footTop + pitch * 0.7, bottom + pitch * 0.2, 4, "#8a8d93");
+    var fh = 0.2 * h, fx = cols[1][0], fw = cols[1][1] - cols[1][0];
+    g.fillStyle = tint; g.globalAlpha = 0.08; g.fillRect(fx, top, fw, fh); g.globalAlpha = 0.5; g.strokeStyle = tint; g.lineWidth = 1.4 * u; g.strokeRect(fx, top, fw, fh);
+    // (the figure: a signal over time, its axes, as most of these papers open with one)
+    g.globalAlpha = 0.55; g.lineWidth = 1.2 * u; g.strokeStyle = "#6c7078"; g.beginPath();
+    g.moveTo(fx + fw * 0.08, top + fh * 0.1); g.lineTo(fx + fw * 0.08, top + fh * 0.88); g.lineTo(fx + fw * 0.95, top + fh * 0.88); g.stroke();
+    for (var tk = 1; tk <= 5; tk++) { g.beginPath(); g.moveTo(fx + fw * (0.08 + 0.145 * tk), top + fh * 0.88); g.lineTo(fx + fw * (0.08 + 0.145 * tk), top + fh * 0.905); g.stroke(); }
+    g.strokeStyle = tint;
     for (var c = 0; c < 3; c++) {
-      g.globalAlpha = 0.9 - 0.25 * c; g.lineWidth = (3.2 - 0.7 * c) * u; g.beginPath();
-      var f1 = 1.5 + 2.5 * R(), f2 = 4 + 5 * R(), ph = R() * TAU, amp = (0.3 - 0.07 * c) * fh;
-      for (var s = 0; s <= 60; s++) { var q = s / 60, yy = top + fh * (0.5 + 0.08 * (c - 1)) + amp * (0.7 * Math.sin(TAU * f1 * q + ph) + 0.3 * Math.sin(TAU * f2 * q + ph * 2)) * (0.35 + 0.65 * Math.sin(Math.PI * q)); if (s) g.lineTo(fx + fw * (0.06 + 0.88 * q), yy); else g.moveTo(fx + fw * 0.06, yy); }
+      g.globalAlpha = 0.92 - 0.27 * c; g.lineWidth = (3 - 0.7 * c) * u; g.beginPath();
+      var f1 = 1.5 + 2.5 * R(), f2 = 4 + 5 * R(), ph = R() * TAU, amp = (0.27 - 0.06 * c) * fh;
+      for (var sI = 0; sI <= 72; sI++) { var qq = sI / 72, yy = top + fh * (0.48 + 0.07 * (c - 1)) + amp * (0.7 * Math.sin(TAU * f1 * qq + ph) + 0.3 * Math.sin(TAU * f2 * qq + ph * 2)) * (0.35 + 0.65 * Math.sin(Math.PI * qq)); if (sI) g.lineTo(fx + fw * (0.11 + 0.82 * qq), yy); else g.moveTo(fx + fw * 0.11, yy); }
       g.stroke();
     }
-    g.globalAlpha = 1; g.fillStyle = "#c9cbcf";
-    g.fillRect(fx + fw * 0.18, top + fh + pitch * 0.7, fw * 0.64, th);
-    bars(1, top + fh + pitch * 2.4, bottom);
+    g.globalAlpha = 1;
+    g.textAlign = "left"; g.fillStyle = "#1d2025"; g.font = "700 " + 13.5 * u + "px " + SANS; g.fillText("Figure 1:", fx, top + fh + pitch * 1.34);
+    var capX = fx + g.measureText("Figure 1: ").width;
+    g.fillStyle = "#55585e"; g.globalAlpha = 0.8;
+    for (var cq = capX; cq < fx + fw - 40 * u;) { var cn = 1 + Math.floor(R() * R() * 9 + R() * 2.4); for (var cl = 0; cl < cn; cl++) g.fillRect(cq + cl * 4.5 * u, top + fh + pitch * 0.92, 3.7 * u, xh); cq += cn * 4.5 * u + 3.8 * u; }
+    g.globalAlpha = 1;
+    yl = words(1, top + fh + pitch * 1.6, bottom, 1);
+    yl = words(1, yl + pitch * 0.8, top + fh + (bottom - top - fh) * 0.6);
+    part(1, yl, 0.6, "2   BACKGROUND", bottom);
+  }
+  // a titled sheet's head alone (where it appeared, its title, its authors): the sheet's lines are drawn in the shader
+  function drawHead(g, x0, y0, w, h, t) {
+    var cx = x0 + w / 2, pad = 12;
+    g.textAlign = "center"; g.textBaseline = "alphabetic";
+    g.fillStyle = "#8a8a8a"; g.font = "500 11px " + SANS; g.fillText(fitText(g, t[2] || "", w - 2 * pad), cx, y0 + 15);
+    var ts = 27, lines;
+    do { ts -= 2; g.font = "700 " + ts + "px " + SANS; lines = wrapText(g, t[1], w - 2 * pad); } while (lines.length > 3 && ts > 13);
+    if (lines.length > 3) { lines.length = 3; lines[2] = fitText(g, lines[2] + " …", w - 2 * pad); }
+    var y = y0 + 19 + ts;
+    g.fillStyle = "#000";
+    lines.forEach(function (ln) { g.fillText(ln, cx, y); y += ts * 1.14; });
+    if (y - ts * 1.14 + 22 <= y0 + h - 4) { g.fillStyle = "#555"; g.font = "500 12.5px " + SERIF; g.fillText(fitText(g, t[3] || "", w - 2 * pad), cx, y - ts * 1.14 + 21); }
+  }
+  function makeHeads() {
+    var n = Math.max(1, TITLED.length), cw = 384, chh = 128, max = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 2048;
+    var cols = Math.max(1, Math.min(10, Math.floor(max / cw))), rows = Math.ceil(n / cols);
+    var cv = document.createElement("canvas"); cv.width = cw * cols; cv.height = chh * rows;
+    var g = cv.getContext("2d");
+    g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height);
+    TITLED.forEach(function (t, j) { drawHead(g, (j % cols) * cw, Math.floor(j / cols) * chh, cw, chh, t); });
+    var tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, cv); // (one channel: the ink)
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return { tex: tex, cols: cols, rows: rows };
   }
   function makeAtlas() {
     var n = Math.max(1, HEROES.length), cols = Math.min(4, n), rows = Math.ceil(n / cols);
@@ -414,42 +505,69 @@
     "precision highp float;",
     "in vec2 vUV; in float vA; in float vLit; in float vPx; in float vFog;",
     "flat in float vHero; flat in vec4 vRnd; flat in float vMod;",
-    "uniform sampler2D uAtlas; uniform vec3 uTint[7]; uniform vec2 uGrid;",
+    "uniform sampler2D uAtlas; uniform sampler2D uHead; uniform vec3 uTint[7]; uniform vec2 uGrid; uniform vec2 uHGrid;",
     "out vec4 o;",
     "float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }",
     "float bx(vec2 uv, vec2 a, vec2 b, vec2 w){ vec2 s = smoothstep(a - w, a + w, uv) - smoothstep(b - w, b + w, uv); return s.x * s.y; }",
     "void main(){",
-    // (the named sheet's picture and the widths are taken outside the branch: both need the neighbours' values)
-    "  float hk = max(vHero, 0.);",
+    // (a front sheet's picture and a titled sheet's head are read outside the branches: both need the neighbours' values)
+    "  float hk = clamp(vHero, 0., 99.);",
     "  vec2 cell = vec2(mod(hk, uGrid.x), floor(hk / uGrid.x + .001));",
     "  vec3 pic = texture(uAtlas, (cell + vUV) / uGrid).rgb;",
-    // a sheet drawn here: title, authors, two columns of lines, a figure in its kind's colour
+    "  float tk = max(vHero - 100., 0.);",
+    "  vec2 hcell = vec2(mod(tk, uHGrid.x), floor(tk / uHGrid.x + .001));",
+    "  vec2 huv = vec2((vUV.x - .06) / .88, (vUV.y - .035) / .2267);",
+    "  float hink = 1. - texture(uHead, (hcell + clamp(huv, .012, .988)) / uHGrid).r;",
+    "  float inHead = step(0., huv.x) * step(huv.x, 1.) * step(0., huv.y) * step(huv.y, 1.);",
+    // a sheet drawn here, as a conference paper's first page: title, authors, two columns of text, a figure
     "  vec2 uv = vUV; vec2 w = fwidth(uv) * .75 + 1e-4;",
-    "  vec3 paper = vec3(.972, .972, .957), ink = vec3(.10, .11, .13), grey = vec3(.775, .78, .79);",
+    "  vec3 paper = vec3(.975, .975, .962), ink = vec3(.09, .10, .12), txt = vec3(.31, .32, .35);",
     "  vec3 tint = uTint[int(vMod + .5)];",
-    "  vec3 col = paper;",
     "  float tw1 = .50 + .26 * vRnd.x, tw2 = .26 + .30 * vRnd.y;",
     "  float t = bx(uv, vec2(.5 - tw1 * .5, .082), vec2(.5 + tw1 * .5, .108), w) + bx(uv, vec2(.5 - tw2 * .5, .122), vec2(.5 + tw2 * .5, .148), w);",
-    "  col = mix(col, ink, clamp(t, 0., 1.) * .9);",
     "  float au = 0.;",
     "  for (int i = 0; i < 3; i++) { float cx = .25 + .25 * float(i); au += bx(uv, vec2(cx - .065, .186), vec2(cx + .065, .197), w) + .55 * bx(uv, vec2(cx - .085, .207), vec2(cx + .085, .214), w); }",
-    "  col = mix(col, vec3(.42, .43, .46), clamp(au, 0., 1.));",
-    "  float y0 = .262, y1 = .932, pitch = .0212;",
-    "  float cI = step(.5, uv.x); float x0 = mix(.09, .53, cI), x1 = mix(.47, .91, cI);",
-    "  float inCol = step(x0, uv.x) * step(uv.x, x1) * step(y0, uv.y) * step(uv.y, y1);",
+    "  vec3 drawnHead = mix(mix(paper, ink, clamp(t, 0., 1.) * .9), vec3(.42, .43, .46), clamp(au, 0., 1.));",
+    "  vec3 col = vHero > 99.5 ? mix(paper, ink, hink * inHead) : drawnHead;",
+    // the text: lines of words' shapes; a paragraph's last line short; now and then a space and a heading
+    "  float y0 = .262, y1 = .936, pitch = .0159;",
+    "  float cI = step(.5, uv.x); float x0 = mix(.085, .525, cI), x1 = mix(.475, .915, cI);",
     "  float row = floor((uv.y - y0) / pitch), fy = fract((uv.y - y0) / pitch);",
-    "  float hh = h21(vec2(row + vRnd.z * 91., cI + vRnd.w * 17.));",
-    "  float len = hh > .86 ? .3 + .55 * fract(hh * 7.3) : 1.;",
-    "  float blank = step(.93, h21(vec2(row * 1.7 + vRnd.x * 53., cI * 3.1 + 2.)));",
+    "  float seed = vRnd.z * 91. + cI * 37.;",
+    "  float hh = h21(vec2(row + seed, 3.7)), hp = h21(vec2(row - 1. + seed, 3.7));",
+    "  float first = (1. - cI) * (1. - step(.5, row));",
+    "  float blank = step(.945, hh) * (1. - first);",
+    "  float heading = max(first, step(.945, hp) * (1. - blank) * step(.5, row));",
+    "  float ending = step(.80, hh) * (1. - blank) * (1. - heading);",
+    "  float len = mix(mix(1., .25 + .6 * fract(hh * 7.3), ending), .26 + .3 * fract(hh * 5.1), heading);",
+    "  float lx = (uv.x - x0) / (x1 - x0);",
     "  float wy = w.y / pitch;",
-    "  float ln = (smoothstep(.20 - wy, .20 + wy, fy) - smoothstep(.64 - wy, .64 + wy, fy)) * step(uv.x, x0 + (x1 - x0) * len) * (1. - blank);",
+    "  float band = smoothstep(.30 - wy, .30 + wy, fy) - smoothstep(.67 - wy, .67 + wy, fy);",
+    "  float gap = step(h21(vec2(floor(lx * 64.) + row * 13.1, seed)), .17) * (1. - heading);",
+    "  float words = mix(.83, 1. - gap, clamp(vPx * .0047 - .7, 0., 1.));",
+    "  float ln = band * step(0., lx) * step(lx, len) * (1. - blank) * words;",
     "  float lod = clamp(vPx * pitch * .9 - .7, 0., 1.);",
-    "  col = mix(col, grey, mix(.42, ln, lod) * inCol);",
-    "  float fc = step(.5, vRnd.x); float fx0 = mix(.09, .53, fc), fx1 = mix(.47, .91, fc);",
-    "  float fy0 = .30 + .36 * vRnd.y, fy1 = fy0 + .15 + .05 * vRnd.z;",
+    "  float inCol = step(x0, uv.x) * step(uv.x, x1) * step(y0, uv.y) * step(uv.y, y1);",
+    // the note at the left column's foot, under its rule
+    "  float foot = (1. - cI) * step(.872, uv.y);",
+    "  inCol *= 1. - foot * step(uv.y, .894);",
+    "  col = mix(col, vec3(.5, .51, .54), bx(uv, vec2(.085, .8895), vec2(.21, .8915), w));",
+    // the figure: a signal in its kind's colour, in one column or the other; the text keeps clear of it
+    "  float fc = step(.5, vRnd.x); float fx0 = mix(.085, .525, fc), fx1 = mix(.475, .915, fc);",
+    "  float fy0 = mix(.30 + .30 * vRnd.y, .268, step(.55, vRnd.w)), fy1 = fy0 + .15 + .06 * vRnd.z;",
     "  float fig = bx(uv, vec2(fx0, fy0), vec2(fx1, fy1), w);",
-    "  col = mix(col, mix(paper, tint, .34 + .34 * (uv.y - fy0) / (fy1 - fy0)), fig);",
-    "  if (vHero > -.5) col = pic;",
+    "  float clear = bx(uv, vec2(fx0 - .02, fy0 - pitch * .7), vec2(fx1 + .02, fy1 + pitch * .9), w);",
+    "  col = mix(col, mix(txt, ink, heading), mix(.30, ln, lod) * .8 * mix(1., .62, foot) * inCol * (1. - clear));",
+    "  float fxn = (uv.x - fx0) / (fx1 - fx0), fyn = (uv.y - fy0) / (fy1 - fy0);",
+    "  float c1 = .5 + .30 * sin(fxn * (6. + 7. * vRnd.w) + vRnd.x * 6.) * sin(3.14159265 * fxn);",
+    "  float c2 = .56 + .16 * sin(fxn * (11. + 6. * vRnd.z) + vRnd.y * 6.);",
+    "  float lw = max(.03, 1.6 * w.y / (fy1 - fy0));",
+    "  float curve = max(1. - smoothstep(lw * .4, lw, abs(fyn - c1)), .55 * (1. - smoothstep(lw * .4, lw, abs(fyn - c2)))) * step(.06, fxn) * step(fxn, .94);",
+    "  vec2 bw = max(vec2(.0035), w * 1.3);",
+    "  float rim = fig - bx(uv, vec2(fx0, fy0) + bw, vec2(fx1, fy1) - bw, w);",
+    "  vec3 fcol = mix(mix(paper, tint, .09), tint, max(curve * .9, clamp(rim, 0., 1.) * .5));",
+    "  col = mix(col, fcol, fig);",
+    "  if (vHero > -.5 && vHero < 99.5) col = pic;",
     "  vec2 q = vUV - .5;",
     "  col *= (1. - .22 * dot(q, q)) * mix(1., .6, vFog);",
     "  o = vec4(col * vLit * vA, vA);",
@@ -457,6 +575,7 @@
   ].join("\n");
 
   var VS_POINT = HEAD + "\n" + [
+    "uniform int uHi[12]; uniform float uHiA[12];",
     "out vec3 vCol; out float vA;",
     "void main(){",
     "  float star = aInfo.y < .5 ? 1. : 0.;",
@@ -499,6 +618,9 @@
     "    a = smoothstep(.1, .45, tf) * mix(tw, 1., max(inflight, w));",
     "    col = mix(mc, vec3(1.), .3 * inflight);",
     "    if (uLag > 0.) { a *= (tf > 0. && tf < 1.) ? uTrail : 0.; size *= .85; }",
+    // (a star whose name is shown just now shines out)
+    "    float hi = 0.; if (uLag <= 0.) { for (int i = 0; i < 12; i++) { if (gl_VertexID == uHi[i]) hi = max(hi, uHiA[i]); } }",
+    "    size *= 1. + 1.5 * hi; a = mix(a, max(a, 1.35), hi); col = mix(col, vec3(1.), .35 * hi);",
     "    a *= 1. + .8 * pulse * w;",
     "  } else {",
     // (uDens: how large the world is drawn; a small one is denser, so its points are smaller and fainter)
@@ -540,11 +662,11 @@
   }
 
   // ---------------------------------------------------------------- set up
-  var progPaper, progPoint, vaoPaper, vaoPoint, vbo, atlas;
+  var progPaper, progPoint, vaoPaper, vaoPoint, vbo, atlas, heads;
   var W = 1, H = 1, dpr = 1, heroBottom = 200, bandBottom = 200;
   var mediaUni = $("gate-uni").querySelector(".gate-media"), mediaWorld = $("gate-world").querySelector(".gate-media");
   var textUni = $("gate-uni").querySelector(".gate-text"), textWorld = $("gate-world").querySelector(".gate-text");
-  var galLabels = [], heroLabels = [];
+  var galLabels = [], starLabels = [], hiK = new Int32Array(SLOTS).fill(-1), hiA = new Float32Array(SLOTS);
 
   function bindParticles(divisor) {
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
@@ -563,10 +685,10 @@
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5]), gl.STATIC_DRAW);
     gl.enableVertexAttribArray(6); gl.vertexAttribPointer(6, 2, gl.FLOAT, false, 0, 0); gl.vertexAttribDivisor(6, 0);
     gl.bindVertexArray(null);
-    atlas = makeAtlas();
-    // the names drawn in the scene: each galaxy's, and the first three named papers' stars
+    atlas = makeAtlas(); heads = makeHeads();
+    // the names drawn in the scene: each galaxy's, and a few papers' at a time, by their stars
     MODS.forEach(function (m, g) { var el = document.createElement("span"); el.className = "glabel"; el.textContent = m; el.style.color = MOD_NIGHT[m] || "#9ba8bb"; labels.appendChild(el); galLabels.push({ el: el, g: g }); });
-    HEROES.slice(0, 3).forEach(function (h) { var el = document.createElement("span"); el.className = "hlabel"; el.textContent = h.name; labels.appendChild(el); heroLabels.push({ el: el, k: OFF[h.g] + h.i }); });
+    for (var sl = 0; sl < SLOTS; sl++) { var se = document.createElement("span"); se.className = "slabel"; labels.appendChild(se); starLabels.push({ el: se, c: null, k: -1, w: 0, h: 0 }); }
   }
 
   function measure() {
@@ -644,11 +766,45 @@
       [textUni, textWorld].forEach(function (el) { el.style.opacity = gt.toFixed(3); el.style.transform = "translate3d(0," + ((1 - gt) * 16).toFixed(1) + "px,0)"; });
     }
     var la = seg(f, 0.88, 1) * (1 - seg(b, 0, 0.1));
+    var nameRects = [];
     galLabels.forEach(function (L) {
       var q = S.gal[L.g]; if (!q.n) return place(L.el, 0, 0, 0);
-      place(L.el, uniC0[0] + q.x * uniS0 - L.el.offsetWidth / 2, uniC0[1] + q.ly * uniS0 - 6, la * 0.92);
+      var gw = L.el.offsetWidth, gx = uniC0[0] + q.x * uniS0 - gw / 2, gy = uniC0[1] + q.ly * uniS0 - 6;
+      place(L.el, gx, gy, la * 0.92);
+      nameRects.push([gx - 8, gy - 6, gx + gw + 8, gy + L.el.offsetHeight + 6]);
     });
-    heroLabels.forEach(function (L) { place(L.el, uniC0[0] + S.pos[L.k * 2] * uniS0 + 12, uniC0[1] + S.pos[L.k * 2 + 1] * uniS0 - 16, la); });
+    // the papers' names: as the stars twinkle, a few shine out in turn and show whose they are. Each label has its
+    // own part of one galaxy (slotLists) and takes a new star there every few seconds: which one follows from the
+    // time alone, so a still at one time is always the same. A name stands beside its star, on the side away from
+    // its galaxy's heart, never on a galaxy's name; where two names would still meet, the later one waits.
+    var nShow = la > 0.001 ? (W < 700 ? 6 : SLOTS) : 0, TURN = 3.6, shown = [];
+    function meet(r1, r2) { return r1[0] < r2[2] && r2[0] < r1[2] && r1[1] < r2[3] && r2[1] < r1[3]; }
+    starLabels.forEach(function (L, j) {
+      var list = slotStars[j] || [];
+      if (j >= nShow || !list.length) { hiK[j] = -1; hiA[j] = 0; if (L.c !== null) { L.c = null; place(L.el, 0, 0, 0); } return; }
+      var tt = t / TURN + j / SLOTS, c = Math.floor(tt), ph = tt - c, heart = S.gal[SLOT_GAL[j]].x;
+      function spot(k) {
+        var sx = uniC0[0] + S.pos[k * 2] * uniS0, sy = uniC0[1] + S.pos[k * 2 + 1] * uniS0;
+        var x = S.pos[k * 2] < heart ? sx - 13 - L.w : sx + 13;
+        if (x < 8) x = sx + 13; else if (x + L.w > W - 8) x = sx - 13 - L.w;
+        var y = Math.max(top + 2, sy - L.h / 2);
+        return [x, y, x + L.w, y + L.h];
+      }
+      if (L.c !== c) {
+        L.c = c;
+        for (var tr = 0; tr < 6; tr++) {
+          L.k = list[Math.floor(hash2(c, j + 97 * tr) * list.length) % list.length];
+          L.el.textContent = NAMES[L.k]; L.w = L.el.offsetWidth; L.h = L.el.offsetHeight;
+          var r0 = spot(L.k);
+          if (!nameRects.some(function (g) { return meet(g, r0); })) break;
+        }
+      }
+      var r = spot(L.k), env = smooth(seg(ph, 0, 0.16)) * (1 - smooth(seg(ph, 0.74, 1)));
+      shown.forEach(function (o) { if (meet(o.r, r)) env *= 1 - o.e; });
+      shown.push({ r: [r[0] - 6, r[1] - 3, r[2] + 6, r[3] + 3], e: env });
+      place(L.el, r[0], r[1], env * la);
+      hiK[j] = L.k; hiA[j] = env * la;
+    });
 
     // draw
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -667,12 +823,15 @@
     if (f < 1) {
       var up = common(progPaper);
       gl.uniform3fv(up.uTint, colSheet); gl.uniform2f(up.uGrid, atlas.cols, atlas.rows); gl.uniform1i(up.uAtlas, 0);
+      gl.uniform2f(up.uHGrid, heads.cols, heads.rows); gl.uniform1i(up.uHead, 1);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, heads.tex);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, atlas.tex);
       gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
       gl.bindVertexArray(vaoPaper); gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, N);
     }
     if (f > 0) {
       var uq = common(progPoint);
+      gl.uniform1iv(uq.uHi, hiK); gl.uniform1fv(uq.uHiA, hiA);
       gl.disable(gl.DEPTH_TEST); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
       gl.bindVertexArray(vaoPoint);
       if (f < 1) for (var k = 4; k >= 1; k--) { gl.uniform1f(uq.uLag, k * 0.011); gl.uniform1f(uq.uTrail, 0.5 * (1 - k / 5)); gl.drawArrays(gl.POINTS, 0, N); }
