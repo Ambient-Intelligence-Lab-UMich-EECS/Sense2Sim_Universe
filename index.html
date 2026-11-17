@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- page:begin -->
+<title>Sense2Sim</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one pinned stage under a slim bar; the page's scroll drives one scene: three first pages,
+   the wall of papers, the Sensing Universe, the Sensing World as a point cloud, then two entrances side by side.
+   Words keep to a band of their own; the scene is framed clear of it. One look: the night sky. */
+:root {
+  color-scheme: dark;
+  --bg: #000000; --ink: #f5f5f7; --ink-2: #a1a1a6; --ink-3: #6e6e73;
+  --line: rgba(255, 255, 255, 0.16); --line-2: rgba(255, 255, 255, 0.32); --card: rgba(255, 255, 255, 0.035);
+  --link: #2997ff;
+  --acoustic: #d9f272; --rf: #6b98ff; --optical: #ff8a5b; --electric: #c7a2ff; --magnetic: #f0c674; --mechanical: #aab5c7;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", Inter, Roboto, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --navh: calc(48px + env(safe-area-inset-top, 0px));
+  --gutter-l: max(24px, env(safe-area-inset-left, 0px)); --gutter-r: max(24px, env(safe-area-inset-right, 0px));
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.47 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; border-radius: 6px; }
+
+/* the bar: solid, so nothing of the scene is ever under its words */
+.nav { position: fixed; inset: 0 0 auto 0; z-index: 5; height: var(--navh); padding-top: env(safe-area-inset-top, 0px);
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.nav .brand { font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+.nav nav { display: flex; gap: clamp(14px, 3vw, 30px); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.nav nav a:hover { color: var(--ink); }
+
+/* without the scene (no WebGL, or less motion asked for): the words and the two entrances, in the page's flow */
+.track { padding-top: var(--navh); }
+.stage { position: relative; padding: clamp(36px, 8vh, 96px) 0 48px; }
+#gl, #labels { display: none; }
+.cap { margin: 0 auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); text-align: center; }
+.cap h1, .cap h2 { margin: 0 auto; font-weight: 600; letter-spacing: -0.03em; line-height: 1.06; text-wrap: balance;
+  background: linear-gradient(180deg, #ffffff 30%, #b9bcc6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cap h1 { font-size: clamp(30px, min(4.4vw, 7.6vh), 68px); max-width: 24em; }
+.cap h2 { font-size: clamp(32px, min(4.6vw, 7.4vh), 64px); }
+.cap p { margin: 12px auto 0; max-width: 46ch; color: var(--ink-2); font-size: clamp(16px, 1.5vw, 21px); line-height: 1.38; text-wrap: balance; }
+.cap .eyebrow { margin: 0 0 12px; font-size: clamp(17px, 1.6vw, 21px); font-weight: 600; letter-spacing: -0.01em;
+  background: linear-gradient(90deg, var(--acoustic), var(--rf) 38%, var(--electric) 68%, var(--optical)); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block; }
+.cap .cue { display: none; }
+#cap-uni, #cap-world { display: none; }
+
+.gates { margin-top: clamp(36px, 7vh, 72px); padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+.gate-row { display: flex; gap: clamp(16px, 2.4vw, 32px); width: min(1280px, 100%); margin: 0 auto; }
+.gate { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+.gate-media { display: block; position: relative; overflow: hidden; width: 100%; aspect-ratio: 16 / 10; max-height: 46vh; border: 1px solid var(--line); border-radius: 28px; background: var(--card);
+  transition: border-color 0.35s ease, background-color 0.35s ease; }
+/* (without the scene the entrances are not left empty: the galaxies as soft lights, the world as a field of points) */
+.gate-media::before { content: ""; position: absolute; inset: 0; }
+#gate-uni .gate-media::before { background:
+  radial-gradient(13% 20% at 59% 32%, rgba(107, 152, 255, 0.6), transparent), radial-gradient(9% 14% at 85% 50%, rgba(217, 242, 114, 0.5), transparent),
+  radial-gradient(8% 13% at 73% 73%, rgba(255, 138, 91, 0.55), transparent), radial-gradient(6% 10% at 36% 77%, rgba(199, 162, 255, 0.55), transparent),
+  radial-gradient(5.5% 9% at 11% 59%, rgba(170, 181, 199, 0.5), transparent), radial-gradient(5% 8% at 23% 37%, rgba(240, 198, 116, 0.55), transparent),
+  radial-gradient(2.5% 4% at 48% 54%, rgba(255, 255, 255, 0.5), transparent); }
+#gate-world .gate-media::before { background: radial-gradient(circle, rgba(150, 196, 255, 0.8) 1px, transparent 1.7px) 0 0 / 11px 11px;
+  -webkit-mask-image: radial-gradient(40% 30% at 50% 56%, #000 55%, transparent 100%); mask-image: radial-gradient(40% 30% at 50% 56%, #000 55%, transparent 100%); }
+.gate:hover .gate-media, .gate:focus-visible .gate-media { border-color: var(--line-2); background: rgba(255, 255, 255, 0.06); }
+.gate-text { display: grid; gap: 4px; padding: 0 6px; }
+.gate-text strong { font-size: clamp(21px, 2.1vw, 30px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.gate-text span { color: var(--ink-2); font-size: clamp(14px, 1.25vw, 17px); line-height: 1.4; }
+.gate-text em { margin-top: 6px; font-style: normal; color: var(--link); font-size: clamp(15px, 1.3vw, 19px); }
+.gate-text em::after { content: "\203A"; display: inline-block; margin-left: 0.3em; transition: transform 0.3s ease; }
+.gate:hover .gate-text em::after { transform: translateX(4px); }
+.madeby { margin: 28px auto 0; max-width: 70ch; text-align: center; color: var(--ink-3); font-size: 12px; line-height: 1.4; }
+
+/* with the scene: the stage pinned, the page's length is the story's */
+.live .track { height: 1000vh; }
+.live .stage { position: sticky; top: var(--navh); height: calc(100vh - var(--navh)); height: calc(100dvh - var(--navh)); padding: 0; overflow: hidden; }
+.live #gl { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+.live #labels { display: block; position: absolute; inset: 0; pointer-events: none; }
+.live .cap { position: absolute; left: 0; right: 0; top: clamp(18px, 4.4vh, 52px); opacity: 0; visibility: hidden; will-change: opacity, transform; pointer-events: none; }
+.live #cap-uni, .live #cap-world { display: block; }
+.live .cap .cue { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--ink-3); font-size: 13px; letter-spacing: 0.02em; }
+.live .cap .cue svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; animation: nudge 1.9s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: translateY(-2px); opacity: 0.55; } 50% { transform: translateY(3px); opacity: 1; } }
+.live .gates { position: absolute; inset: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; opacity: 0; visibility: hidden; }
+.live .gate-media { background: transparent; }
+.live .gate-media::before { display: none; }
+.live .gate-text { will-change: transform, opacity; opacity: 0; }
+.live .madeby { position: absolute; left: var(--gutter-l); right: var(--gutter-r); bottom: max(14px, env(safe-area-inset-bottom, 0px)); margin: 0 auto; }
+
+/* the galaxies' names and three papers' stars, drawn in the scene's own place */
+.glabel, .hlabel { position: absolute; left: 0; top: 0; white-space: nowrap; will-change: transform, opacity; opacity: 0; }
+.glabel { font: 600 12px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; transform-origin: 0 0; }
+.hlabel { font: 600 14px/1 var(--sans); letter-spacing: -0.01em; color: var(--ink); text-shadow: 0 0 6px #000, 0 0 2px #000; }
+
+@media (max-width: 700px) {
+  .gate-row { flex-direction: column; gap: 18px; }
+  .gate { gap: 10px; }
+  .gate-media { aspect-ratio: 16 / 9; max-height: 22vh; border-radius: 20px; }
+  .gate-text { gap: 2px; }
+  .gate-text em { margin-top: 2px; }
+  .glabel { font-size: 10px; letter-spacing: 0.1em; }
+  .hlabel { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .live .cap .cue svg { animation: none; } }
+</style>
+
+<header class="nav">
+  <a class="brand" href="#top" id="brand">Sense2Sim</a>
+  <nav aria-label="Entrances">
+    <a href="pages/universe/index.html" data-go="universe">Sensing Universe</a>
+    <a href="pages/world/index.html" data-go="world">Sensing World</a>
+  </nav>
+</header>
+
+<main class="track" id="track">
+  <div class="stage" id="stage">
+    <canvas id="gl" aria-hidden="true"></canvas>
+
+    <section class="cap" id="cap-hero">
+      <p class="eyebrow">Sense2Sim</p>
+      <h1>Turning Ubiquitous Sensing Research Into Interactive Physical Models</h1>
+      <span class="cue">Scroll <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg></span>
+    </section>
+
+    <section class="cap" id="cap-uni">
+      <h2>Sensing Universe</h2>
+      <p>Every paper is a star, gathered by how it senses.</p>
+    </section>
+
+    <section class="cap" id="cap-world">
+      <h2>Sensing World</h2>
+      <p>Papers placed in everyday spaces, running on the devices already there.</p>
+    </section>
+
+    <div id="labels" aria-hidden="true"></div>
+
+    <section class="gates" id="gates" aria-label="Two entrances">
+      <div class="gate-row">
+        <a class="gate" id="gate-uni" href="pages/universe/index.html" data-go="universe">
+          <span class="gate-media"></span>
+          <span class="gate-text"><strong>Sensing Universe</strong><span>Explore the papers as a map of stars.</span><em>Enter Universe</em></span>
+        </a>
+        <a class="gate" id="gate-world" href="pages/world/index.html" data-go="world">
+          <span class="gate-media"></span>
+          <span class="gate-text"><strong>Sensing World</strong><span>Walk through the everyday spaces where the papers run.</span><em>Enter World</em></span>
+        </a>
+      </div>
+      <p class="madeby">The Sensing Universe and the Sensing World are generated by the Sense2Sim skill and AI agent models. AI agent models may make mistakes.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+// The offline package's loader (tools/offline.mjs writes it first into each page it packs, with the page's own list
+// in place of the empty one below). A page opened from the disk (file://) may load a classic script or a picture
+// beside it, but no module, no fetch and no picture asked for with crossorigin: what the page would fetch or import
+// is therefore written beside it as classic scripts, each setting SW_OFFLINE_DATA[<its key>] to its content, and read
+// here when the page asks for it. The same path is taken over http (a local server), so the package behaves one way.
+// M: each key (a file's path from the page, as the page names it, or mediapipe/<file>) -> the script that holds it,
+// the type it is served as, and how it is held ("b64" bytes in base64, "text" the text itself).
+// SW_OFFLINE_IMAGES (images.offline.js, loaded before this): pictures the page asks for with crossorigin (three's
+// TextureLoader), as data: URLs; an <img> given one of their paths is given the data: URL instead.
+(() => {
+  const M = {};
+  const D = (window.SW_OFFLINE_DATA = window.SW_OFFLINE_DATA || {});
+  const IMG = window.SW_OFFLINE_IMAGES || {};
+  const scripts = {}, bins = {}, stats = { served: [], missing: [], images: 0, fetched: 0 };
+  const script = (file) => scripts[file] || (scripts[file] = new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = file;
+    s.onload = () => ok();
+    s.onerror = () => no(new Error(`offline package: ${file} is missing`));
+    (document.head || document.documentElement).appendChild(s);
+  }));
+  async function get(key) {
+    if (!(key in D)) {
+      const m = M[key];
+      if (!m) { stats.missing.push(key); throw new Error(`offline package: it holds no ${key}`); }
+      await script(m.file);
+      if (!(key in D)) { stats.missing.push(key); throw new Error(`offline package: ${m.file} does not hold ${key}`); }
+    }
+    if (!stats.served.includes(key)) stats.served.push(key);
+    return D[key];
+  }
+  const fromB64 = (b64) => { const s = atob(b64), a = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return a; };
+  // a key's bytes, a fresh copy each time (a task may keep or detach what it is given)
+  const bin = (key) => (bins[key] || (bins[key] = get(key).then((v) => (M[key] && M[key].enc === "text" ? new TextEncoder().encode(v) : fromB64(v))))).then((a) => a.slice());
+  // a URL under the page's own folder is a file of the package, named by its path from there
+  const keyOf = (u) => {
+    try {
+      const h = new URL(String(u), document.baseURI).href.split(/[?#]/)[0], b = new URL(".", document.baseURI).href;
+      return h.startsWith(b) ? decodeURIComponent(h.slice(b.length)) : null;
+    } catch (e) { return null; }
+  };
+  // fetch: a file of the package's from its script, anything else as before (a blob: or data: URL, a local server)
+  const nativeFetch = typeof window.fetch === "function" ? window.fetch.bind(window) : null;
+  if (nativeFetch && Object.keys(M).length) window.fetch = function (input, init) {
+    const u = typeof input === "string" ? input : input && (input.url || input.href);
+    const k = u != null ? keyOf(u) : null;
+    if (k && M[k]) { stats.fetched++; return bin(k).then((b) => new Response(b, { status: 200, headers: { "content-type": M[k].type } })); }
+    return nativeFetch(input, init);
+  };
+  // an <img> given a picture the package holds as a data: URL
+  const src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+  if (src && src.set && Object.keys(IMG).length) Object.defineProperty(HTMLImageElement.prototype, "src", {
+    configurable: true, enumerable: src.enumerable, get: src.get,
+    set(v) { const k = keyOf(v); if (k && IMG[k]) { stats.images++; src.set.call(this, IMG[k]); } else src.set.call(this, v); },
+  });
+  const dataJs = async (key) => "data:text/javascript;base64," + (await get(key));
+  window.SW_OFFLINE = {
+    get, bin, keyOf,
+    stats: () => JSON.parse(JSON.stringify(stats)),
+    // a module the page imported from beside it (world/<id>.glb.js: its default export, the room's GLB in base64)
+    module: async (key) => ({ default: await get(key) }),
+    // MediaPipe's tasks-vision from the package: its bundle as a module (a data: URL, which a page from the disk may
+    // import), and the files of its wasm, the SIMD build where the browser runs SIMD, as its FilesetResolver would pick
+    mediapipe: async () => import(await dataJs("mediapipe/vision_bundle.mjs")),
+    mpFiles: async (mp) => {
+      const k = (await mp.FilesetResolver.isSimdSupported()) ? "vision_wasm_internal" : "vision_wasm_nosimd_internal";
+      return { wasmLoaderPath: await dataJs(`mediapipe/${k}.js`), wasmBinaryPath: `${k}.wasm`, offlineKey: k };
+    },
+    // a task made from the package: its model given as bytes (baseOptions.modelAssetBuffer), and the wasm handed to
+    // the loader as Module.wasmBinary (the bundle passes self.Module to the loader, which then fetches no wasm)
+    mpTask: async (Task, files, model, options) => {
+      const buf = await bin(model), wasm = await bin(`mediapipe/${files.offlineKey}.wasm`);
+      self.Module = { wasmBinary: wasm };
+      return Task.createFromOptions(files, { ...options, baseOptions: { ...(options.baseOptions || {}), modelAssetBuffer: buf } });
+    },
+  };
+})();
+</script>
+<script src="intro-data.js"></script>
+<script src="intro.js"></script>
+<!-- page:end -->
+</body>
+</html>
