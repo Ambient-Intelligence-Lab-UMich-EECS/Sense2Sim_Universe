@@ -268,10 +268,13 @@
       if (stopped) return;
       raf(frame);
       var t = performance.now(), dt = Math.min(0.1, (t - last) / 1000); last = t;
-      // with no word from the page yet, the cloud starts to gather by itself, a part of the way
-      var creep = (shape === "universe" ? 0.85 : 0.1) * (1 - Math.exp(-(t - t0) / 1000 / (shape === "universe" ? 1.5 : 1.0)));
+      // with no word from the page yet, the cloud starts to gather by itself, a part of the way: the World's town
+      // shows its first shapes within about 2 s on a slow line (run 21: at 10 Mbit/s only faint dust for 5 s, its
+      // first models came late; run 22, to 0.32 over 1.6 s: still dust at 2 s, as a point forms only once the cloud
+      // is past its own delay, up to 0.6), the Universe's galaxies within about 1 s (run 21: in the last 0.5 s)
+      var creep = (shape === "universe" ? 0.85 : 0.55) * (1 - Math.exp(-(t - t0) / 1000 / (shape === "universe" ? 0.7 : 1.0)));
       var to = Ft >= 1 ? 1 : Math.max(Ft, creep);
-      F = still ? to : F + (to - F) * (1 - Math.exp(-dt * (Ft >= 1 ? 9 : 2.6)));
+      F = still ? to : F + (to - F) * (1 - Math.exp(-dt * (Ft >= 1 ? 9 : 3.6)));
       if (!g) return;
       // while the page loads, the points are drawn every third frame (20 a second on a 60 Hz screen; the cloud turns
       // slowly): each drawn frame takes processor time from the page's own loading. On a software GPU the World was
