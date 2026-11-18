@@ -114,9 +114,10 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; border-ra
 
 <header class="nav">
   <a class="brand" href="#top" id="brand">Sense2Sim</a>
+  <!-- (the entrances open a tab of their own: this page stays where the reader left it; AmI, 2026-11-18) -->
   <nav aria-label="Entrances">
-    <a href="pages/universe/index.html" data-go="universe">Sensing Universe</a>
-    <a href="pages/world/index.html" data-go="world">Sensing World</a>
+    <a href="pages/universe/index.html" data-go="universe" target="_blank" rel="noopener">Sensing Universe</a>
+    <a href="pages/world/index.html" data-go="world" target="_blank" rel="noopener">Sensing World</a>
   </nav>
 </header>
 
@@ -144,11 +145,11 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; border-ra
 
     <section class="gates" id="gates" aria-label="Two entrances">
       <div class="gate-row">
-        <a class="gate" id="gate-uni" href="pages/universe/index.html" data-go="universe">
+        <a class="gate" id="gate-uni" href="pages/universe/index.html" data-go="universe" target="_blank" rel="noopener">
           <span class="gate-media"></span>
           <span class="gate-text"><strong>Sensing Universe</strong><span>Explore the papers as a map of stars.</span></span>
         </a>
-        <a class="gate" id="gate-world" href="pages/world/index.html" data-go="world">
+        <a class="gate" id="gate-world" href="pages/world/index.html" data-go="world" target="_blank" rel="noopener">
           <span class="gate-media"></span>
           <span class="gate-text"><strong>Sensing World</strong><span>Walk through the everyday spaces where the papers run.</span></span>
         </a>

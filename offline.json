@@ -1,18 +1,18 @@
 {
  "tool": "tools/offline.mjs",
- "made": "2026-11-18T01:36:36.540Z",
+ "made": "2026-11-18T02:00:27.465Z",
  "about": [
   "Sense2Sim Universe: the Sensing Universe and the Sensing World, shared by every Sense2Sim paper page",
   "Sensing Universe: the SenseWeaver knowledge base, 1,401 papers and 42 considered (updated 2026-11-17); the Model rating filter starts with A and B",
-  "Sensing World: its spaces as of 2026-11-17, built from SenseWeaver top-down b1de8279 (unified/all/spaces/sim)",
+  "Sensing World: its spaces as of 2026-11-18, built from SenseWeaver top-down b1de8279 (unified/all/spaces/sim)",
   "3D models from the SenseWeaver asset pack (pack of 2026-11-12); credits and licences in CREDITS.md",
-  "The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, 9836c12)",
-  "Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0); the Sensing World packed again the same day (cc67d89)"
+  "The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, ca64fb6)",
+  "Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0)"
  ],
  "source": {
   "index": {
-   "bytes": 11085,
-   "sha256": "068fc7d97e4ba44fbb6a2a76abf3aa62f814638e7a2b750932b99744506ae526"
+   "bytes": 11319,
+   "sha256": "26ee46f41b71cd1cbad3d7ba69de8972259ce096bc16beda6189431559e8fb64"
   }
  },
  "rewritten": [
@@ -535,16 +535,16 @@
   {
    "name": "universe",
    "index": {
-    "bytes": 6746242,
-    "sha256": "b31e075d7148097aead4d661b8a3e53c916988af132b7e203865916f76dcfbab"
+    "bytes": 6759870,
+    "sha256": "bd80811132d50676bfd694ed67d5b96f340b2f72f3964cba3030a0b56a4a5cb8"
    },
-   "title": "SenseWeaver Knowledge Base Review"
+   "title": "Sensing Universe"
   },
   {
    "name": "world",
    "index": {
-    "bytes": 3273,
-    "sha256": "a397ed4317dd02d36f3b032b7e3f02e98bb1f80b9995f0527a2192780504e30b"
+    "bytes": 16918,
+    "sha256": "1da8c786a7eee7ef6cdbbd35ea7615b654ac760375435ce7d7309e3e93da740b"
    },
    "title": "Sensing World"
   }
@@ -577,8 +577,8 @@
   },
   {
    "path": "index.html",
-   "bytes": 16431,
-   "sha256": "59eb2858a739acf16b42fddd62042c749c9778551b845f59dc74ae928ed86ec7"
+   "bytes": 16665,
+   "sha256": "dd921d3fee62cd90a40fe707f407dbae0e75932e5fa0d577b0e3449c973241b6"
   },
   {
    "path": "intro-data.js",
@@ -592,8 +592,8 @@
   },
   {
    "path": "pages/universe/index.html",
-   "bytes": 7551788,
-   "sha256": "0eb3c7fa5913c9b25e76fcbda68d4ed9add52744be3c373fcd6e943ffea9c45e"
+   "bytes": 7565416,
+   "sha256": "6fa79085826b508f4cb6525998795d8ef5de36f3e44672688b89ff45553010aa"
   },
   {
    "path": "pages/world/images.offline.js",
@@ -602,8 +602,8 @@
   },
   {
    "path": "pages/world/index.html",
-   "bytes": 4673434,
-   "sha256": "47c518b5803599cb5c098522503a4143d78293670e93776539ea1c889110d862"
+   "bytes": 4687079,
+   "sha256": "560294b7550ca9ee7908e2f28ebcdf7ea7f9a1d2541092809bc96a27d09152b2"
   },
   {
    "path": "pages/world/models/A26.json.offline.js",
@@ -1517,8 +1517,8 @@
   },
   {
    "path": "README.md",
-   "bytes": 1919,
-   "sha256": "d3c8d21b807be764e62b5bd96e22821c14c6e23ae6637de0432ce46311abc6c8"
+   "bytes": 1813,
+   "sha256": "a2d7957e2c028ec0e7cfac37a0e9c24968041a361d90c1fbb0735147de24a3b4"
   }
  ],
  "notes": [],
