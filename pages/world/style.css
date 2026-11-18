@@ -129,6 +129,8 @@ button, select, input { font: inherit; color: inherit; }
 .space-card svg { color: var(--accent); }
 .space-card svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 @keyframes card-in { from { opacity: 0; transform: translate(-50%, -40%); } }
+.loading { position: absolute; left: 50%; bottom: 12px; z-index: 3; transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; background: var(--panel); color: var(--muted); border: 1px solid var(--line-strong); font: 12px/1.2 var(--mono); white-space: nowrap; pointer-events: none; }
+.loading[hidden] { display: none; }
 @media (max-width: 520px) { .step-btn { height: 38px; min-width: 38px; padding: 0 7px; } .step-btn.prev { left: 8px; } .step-btn.next { right: 8px; } }
 /* the heading as a path: the levels before the last are links back */
 .crumbs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }

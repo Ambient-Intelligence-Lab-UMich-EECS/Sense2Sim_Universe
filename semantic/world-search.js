@@ -108,11 +108,12 @@
     var theme = document.getElementById("theme");
     if (theme && theme.parentNode === row) row.insertBefore(box, theme); else row.append(box);
     input.addEventListener("input", search);
-    input.addEventListener("focus", function () { if (last && input.value.trim().length >= 2) { list.hidden = false; } });
+    input.addEventListener("focus", function () { if (S.start) S.start(); if (last && input.value.trim().length >= 2) { list.hidden = false; } });
     input.addEventListener("keydown", keys);
     document.addEventListener("pointerdown", function (e) { if (!box.contains(e.target)) close(); });
     S.onstate = function () { if (input.value.trim().length >= 2) search(); };
-    S.init({ which: "world" });
+    // the model waits until the World's space is built (__sim: the test the checks use), or for the search box's focus
+    S.init({ which: "world", when: new Promise(function (res) { (function wait() { var s = window.__sim; if (s && s.run && !s.building) res(); else setTimeout(wait, 250); })(); }) });
     window.S2S_WORLD_SEARCH = { input: input, list: list, last: function () { return last; } }; // for the checks
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setup); else setup();

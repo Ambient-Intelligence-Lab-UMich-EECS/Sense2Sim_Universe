@@ -5,7 +5,10 @@
 // Universe's tour speaks of the search by meaning only where window.S2S_SEMANTIC is).
 //   S2S_SEMANTIC.init({ base, which: "universe" | "world", keys, idle })
 //     base: where semantic/ is (default: where this script was loaded from); keys: the page's own paper keys, to refuse an index
-//     made for other papers; idle: start when the page is idle (default), not at once
+//     made for other papers; idle: start when the page is idle (default), not at once; when: a promise the page resolves
+//     when its own loading is done (the World's space built, the Universe's graph drawn): the model's download waits for
+//     it, so it does not compete with the page (then idle as before)
+//   S2S_SEMANTIC.start(): start now (the reader is at the search box), whatever init waits for
 //   S2S_SEMANTIC.search(q) -> Promise of the worker's result, or null (not ready), or { stale: true } (a newer query
 //     came first)
 //   S2S_SEMANTIC.state: "off" | "loading" | "words" (keywords can answer) | "ready" (the model too); onstate(S) on change;
@@ -55,9 +58,15 @@
         worker.postMessage({ type: "init", base: root, manifest: M, which: which });
       }).catch(function (e) { off(String(e.message || e)); });
     }
-    if (o.idle === false) go();
-    else if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 3000 });
-    else setTimeout(go, 200);
+    var started = false;
+    function start() { if (started) return; started = true; go(); }
+    S.start = start;
+    function soon() {
+      if (o.idle === false) start();
+      else if (window.requestIdleCallback) requestIdleCallback(start, { timeout: 3000 });
+      else setTimeout(start, 200);
+    }
+    if (o.when && typeof o.when.then === "function") o.when.then(soon, soon); else soon();
   };
   // the Universe's index must hold exactly the page's papers; the World's, only papers the page knows
   function sameKeys(page, index, which) {

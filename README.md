@@ -1,35 +1,12 @@
-# Sense2Sim: offline package
+# Sense2Sim Universe
 
-在线版 / Online: https://ambient-intelligence-lab-umich-eecs.github.io/Sense2Sim_Universe/
+https://ambient-intelligence-lab-umich-eecs.github.io/Sense2Sim_Universe/
 
-- Sense2Sim Universe: the Sensing Universe and the Sensing World, shared by every Sense2Sim paper page
-- Sensing Universe: the SenseWeaver knowledge base, 1,401 papers and 42 considered (updated 2026-11-17); the Model rating filter starts with A and B
-- Sensing World: its spaces as of 2026-11-18, built from SenseWeaver top-down b1de8279 (unified/all/spaces/sim)
-- 3D models from the SenseWeaver asset pack (pack of 2026-11-12); credits and licences in CREDITS.md
-- The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, ca64fb6)
-- Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0)
-- Semantic search (senseweaver-models tools/semantic, e8f5d0a): only on the published site; opened from the disk, the pages work as before, without it
+The pages every Sense2Sim paper page links to:
 
-## 打开方式
+- `index.html`: the first page, a scroll-driven way into the two pages below.
+- `pages/universe/`: the Sensing Universe, the SenseWeaver knowledge base of sensing papers, as a map, a graph and a table.
+- `pages/world/`: the Sensing World, everyday spaces in 3-D, each with the papers that sense in it.
+- `semantic/`: the search by meaning used by both pages; it runs in the browser and loads after the page is ready.
 
-1. 解压后双击 `index.html`。推荐用 Chrome 或 Edge；不需要网络。
-2. 页面链接到的页面（`pages/` 里：“Sensing Universe”, “Sensing World”）都在包里。
-
-仍需联网的只有这些链接（点开时才需要）：没有
-
-## How to open
-
-1. Unzip, then double-click `index.html`. Chrome or Edge recommended; no network needed.
-2. The pages it links to (under `pages/`: “Sensing Universe”, “Sensing World”) are in the package.
-
-Only these links still need the network (when clicked): none
-
-## What is in it
-
-- `index.html`: the page, as built, with its loads pointed at the package (offline.json lists every line rewritten)
-- `pages/universe/`: a copy of the page “Sensing Universe”
-- `pages/world/`: a copy of the page “Sensing World”
-- `CREDITS.md`
-- 83 font files from Google Fonts, inlined
-
-Made by tools/offline.mjs (SenseWeaver, skill senseweaver6); `offline.json` gives each file's bytes and sha256 and where each came from.
+The 3-D models come from the SenseWeaver asset pack; their credits and licences are in `CREDITS.md`.
