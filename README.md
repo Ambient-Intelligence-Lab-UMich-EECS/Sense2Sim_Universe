@@ -8,6 +8,7 @@
 - 3D models from the SenseWeaver asset pack (pack of 2026-11-12); credits and licences in CREDITS.md
 - The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, ca64fb6)
 - Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0)
+- Semantic search (senseweaver-models tools/semantic, 63d2dde): only on the published site; opened from the disk, the pages work as before, without it
 
 ## 打开方式
 

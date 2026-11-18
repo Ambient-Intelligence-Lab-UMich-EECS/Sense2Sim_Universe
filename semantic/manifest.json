@@ -1,0 +1,62 @@
+{
+ "what": "Sense2Sim_Universe: searching the Sensing Universe and World by meaning (senseweaver-models tools/semantic)",
+ "recipe": "card-1",
+ "created": "2026-11-18T02:17:48.110Z",
+ "commit": "63d2dde8e0b40f93a985737d5d1639fb485a4fb5",
+ "model": {
+  "id": "A1",
+  "name": "Xenova/all-MiniLM-L6-v2",
+  "dir": "m-e92fccaf8b/",
+  "local": "all-MiniLM-L6-v2",
+  "dtype": "q8",
+  "pooling": "mean",
+  "query": "",
+  "passage": "",
+  "files": {
+   "all-MiniLM-L6-v2/config.json": "7135149f7cffa1a573466c6e4d8423ed73b62fd2332c575bf738a0d033f70df7",
+   "all-MiniLM-L6-v2/tokenizer.json": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0",
+   "all-MiniLM-L6-v2/tokenizer_config.json": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3",
+   "all-MiniLM-L6-v2/onnx/model_quantized.onnx": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1"
+  }
+ },
+ "runtime": {
+  "dir": "rt-ece0bb0473/",
+  "lib": "transformers.min.js",
+  "wasm": {
+   "mjs": "ort-wasm-simd-threaded.asyncify.js",
+   "wasm": "ort-wasm-simd-threaded.asyncify.wasm"
+  },
+  "transformers": "4.3.2",
+  "onnxruntime_web": "1.31.0-dev.20260914-8d85527a0",
+  "files": {
+   "transformers.min.js": 587917,
+   "ort-wasm-simd-threaded.asyncify.js": 53057,
+   "ort-wasm-simd-threaded.asyncify.wasm": 26861777
+  }
+ },
+ "worker": "js-7862845724/worker.js",
+ "client": "client.js",
+ "rank": {
+  "k": 20,
+  "vector_weight": 2
+ },
+ "universe": {
+  "json": "universe-8a264cd22d.json",
+  "bin": "universe-f69221b0f4.bin",
+  "rows": 1443,
+  "dims": 384,
+  "abstracts": 1406,
+  "kb_sha256": "ed0973c2cce81fe2584465d5e81267fe5d73c5b578aec6f150723216dc99afcc",
+  "kb_form": "page"
+ },
+ "world": {
+  "json": "world-0d65286d00.json",
+  "bin": "world-c3d1a69412.bin",
+  "rows": 1666,
+  "dims": 384,
+  "papers": 1217,
+  "spaces": 16,
+  "source_sha256": "857cdfaa5ecaad5db81c4e54ba6cde670ca9fa4607568815cfeda84968487ea8"
+ },
+ "glossary": "glossary-e0151b20ce.tsv"
+}
