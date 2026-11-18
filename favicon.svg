@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Sense2Sim: the name's first letter in the name's own colours (the ways of sensing), on the night sky -->
+  <defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="14" y1="10" x2="50" y2="54">
+      <stop offset="0" stop-color="#d9f272"/>
+      <stop offset="0.38" stop-color="#6b98ff"/>
+      <stop offset="0.68" stop-color="#c7a2ff"/>
+      <stop offset="1" stop-color="#ff8a5b"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#000"/>
+  <path d="M44 21C44 9.5 20 9.5 20 22C20 34 44 30 44 42C44 54.5 20 54.5 20 43" fill="none" stroke="url(#g)" stroke-width="8.5" stroke-linecap="round"/>
+</svg>

@@ -1,18 +1,18 @@
 {
  "tool": "tools/offline.mjs",
- "made": "2026-11-18T00:00:11.345Z",
+ "made": "2026-11-18T00:43:44.175Z",
  "about": [
   "Sense2Sim Universe: the Sensing Universe and the Sensing World, shared by every Sense2Sim paper page",
   "Sensing Universe: the SenseWeaver knowledge base, 1,401 papers and 42 considered (updated 2026-11-17); the Model rating filter starts with A and B",
-  "Sensing World: its spaces as of 2026-11-17",
+  "Sensing World: its spaces as of 2026-11-17, built from SenseWeaver main c1070103 (unified/all/spaces/sim)",
   "3D models from the SenseWeaver asset pack (pack of 2026-11-12); credits and licences in CREDITS.md",
-  "The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, 6a40e51)",
+  "The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, 9836c12)",
   "Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0)"
  ],
  "source": {
   "index": {
-   "bytes": 10787,
-   "sha256": "d655935ecd7fb0193c8b01763592c81ba9a885db647d1b1562347d18188e1711"
+   "bytes": 11085,
+   "sha256": "068fc7d97e4ba44fbb6a2a76abf3aa62f814638e7a2b750932b99744506ae526"
   }
  },
  "rewritten": [
@@ -543,8 +543,8 @@
   {
    "name": "world",
    "index": {
-    "bytes": 3819,
-    "sha256": "03a8f21bc27f393307a6bf15517073a21a47a1aab2f0f031b1893e86040f4002"
+    "bytes": 3273,
+    "sha256": "a397ed4317dd02d36f3b032b7e3f02e98bb1f80b9995f0527a2192780504e30b"
    },
    "title": "Sensing World"
   }
@@ -556,14 +556,29 @@
    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
+   "path": "apple-touch-icon.png",
+   "bytes": 8216,
+   "sha256": "569870844095ee30d1373d6235d019a214a4117bc0460c4427ac085a870a8d60"
+  },
+  {
    "path": "CREDITS.md",
    "bytes": 71887,
    "sha256": "2a4af61c0a510b78682f1bb1b2c7c6f1caa5dacc49ee30bac3cff853bcb48983"
   },
   {
+   "path": "favicon.png",
+   "bytes": 1150,
+   "sha256": "052c1a969801e4bce76c5e74fe1d2e734f3399805f1845ece85fcdd2b13a6d4e"
+  },
+  {
+   "path": "favicon.svg",
+   "bytes": 707,
+   "sha256": "6446c1b7708938ca9f8ef83ab1fc00c59a9549052f00d1c096405c7a355f8ddb"
+  },
+  {
    "path": "index.html",
-   "bytes": 16133,
-   "sha256": "0a8becd499fcbdc689359d67585f489d38566b7043a0bcff0beacdf884297515"
+   "bytes": 16431,
+   "sha256": "59eb2858a739acf16b42fddd62042c749c9778551b845f59dc74ae928ed86ec7"
   },
   {
    "path": "intro-data.js",
@@ -587,8 +602,8 @@
   },
   {
    "path": "pages/world/index.html",
-   "bytes": 4408158,
-   "sha256": "7c262fde1bd10e231e3a2085b11b09b72b78b50e0324393ab68f3e835edfc6dc"
+   "bytes": 4410300,
+   "sha256": "ed0e25d05adfbf63b5bc0c2fb5aacf8293f79dc74bb1d9c4e0e430f70b77aecf"
   },
   {
    "path": "pages/world/models/A26.json.offline.js",
@@ -667,8 +682,8 @@
   },
   {
    "path": "pages/world/models/OBJ-arduino_uno_2.json.offline.js",
-   "bytes": 57312,
-   "sha256": "aeda0c17434b817c7df029fc792b796ee3e36c4739e878c8d53c31a28e9088f5"
+   "bytes": 85484,
+   "sha256": "a2d0e56333c91bbc93aa7ee129a990823e905f049cbf788991d733cd408743b5"
   },
   {
    "path": "pages/world/models/OBJ-bollard.json.offline.js",
@@ -677,8 +692,8 @@
   },
   {
    "path": "pages/world/models/OBJ-cell_tower.json.offline.js",
-   "bytes": 681594,
-   "sha256": "3949ea57264058456839e4cd96ac1310a1f675cb9006b3fdcc2f33e27d558d97"
+   "bytes": 427478,
+   "sha256": "c63c04d3ea355ac9e40467902e81cfa0027f0225e6cfbc2567551534967ae5c3"
   },
   {
    "path": "pages/world/models/OBJ-checkout.json.offline.js",
@@ -687,13 +702,13 @@
   },
   {
    "path": "pages/world/models/OBJ-child_car_seat.json.offline.js",
-   "bytes": 497122,
-   "sha256": "a0dbab5ebdd11cd62785acf9de9597f70c4a7dabb64a21d12c802c9053d2da86"
+   "bytes": 414690,
+   "sha256": "ecacf064c6e79ea3d190668a0a2459a881a657610d490c3ab8b15dc0577a9295"
   },
   {
    "path": "pages/world/models/OBJ-cnc_mill.json.offline.js",
-   "bytes": 663058,
-   "sha256": "c6959f6ff535ff29ae285f78d97f5bfcf06e9501dfe9574981e3b92743970ea8"
+   "bytes": 295442,
+   "sha256": "34ad5b529bc64bbfd7dc1a91190f67b087f22c7b269dc2231186c6a3957b9862"
   },
   {
    "path": "pages/world/models/OBJ-conveyor.json.offline.js",
@@ -747,8 +762,8 @@
   },
   {
    "path": "pages/world/models/OBJ-hospital_bed.json.offline.js",
-   "bytes": 361814,
-   "sha256": "2d9ab46bd424cb1ff1dc3ba4260691d5937e8476fefc9ff43378cb2ca3e9a15a"
+   "bytes": 178250,
+   "sha256": "e469b679f0b959b8ff1707a1fa8f79ec76daad49ab38530732504507496c1da1"
   },
   {
    "path": "pages/world/models/OBJ-id_card.json.offline.js",
@@ -757,8 +772,8 @@
   },
   {
    "path": "pages/world/models/OBJ-incubator.json.offline.js",
-   "bytes": 978368,
-   "sha256": "7911ac81cb496a1b982ed5e828bbc38fbf99b91eb1ea3d2c01f9361c9f7587a1"
+   "bytes": 765172,
+   "sha256": "60730f9758bbc902f4696f838feb3ae5c3acb55013f28eb364e2af9b753bd785"
   },
   {
    "path": "pages/world/models/OBJ-inhaler.json.offline.js",
@@ -782,13 +797,13 @@
   },
   {
    "path": "pages/world/models/OBJ-laser_module_board.json.offline.js",
-   "bytes": 417154,
-   "sha256": "b128b9eba2ad281571f4104bd94d1d2ac66ae61a2bbf5a535dcf70191ab5168a"
+   "bytes": 306402,
+   "sha256": "069c242726c40af67cf16e09b962514548b310548a73e4c226b6759fba79c892"
   },
   {
    "path": "pages/world/models/OBJ-maize.json.offline.js",
-   "bytes": 1279596,
-   "sha256": "36600b6fc324d43156cd7d92601936b006243741a27741ae87361a15fff5023a"
+   "bytes": 1223276,
+   "sha256": "7449b827a88dd69dff77eedab9a0f0657d7c2c43d1cc99ec978b63f43772ee2a"
   },
   {
    "path": "pages/world/models/OBJ-maple_tree.json.offline.js",
@@ -802,13 +817,13 @@
   },
   {
    "path": "pages/world/models/OBJ-nikon_d6.json.offline.js",
-   "bytes": 1124790,
-   "sha256": "7392f3fad74dba442d7e47f81d81054e46a96cbae941604e9a68ee3eddadfa42"
+   "bytes": 511262,
+   "sha256": "fbee8a7da5b413bcf5f733698cb274e4121fdc16e7a746f770538088fb844153"
   },
   {
    "path": "pages/world/models/OBJ-park_bench.json.offline.js",
-   "bytes": 457658,
-   "sha256": "546ae311d8e35fa95fe00c9e57b6b3e389156eaaaba71a01b9c9d6a8ec48bf01"
+   "bytes": 266198,
+   "sha256": "96fc529341938f58403394261839854ed19d8a33c573e4e63936898ac5ea7898"
   },
   {
    "path": "pages/world/models/OBJ-rail_fence.json.offline.js",
@@ -857,8 +872,8 @@
   },
   {
    "path": "pages/world/models/OBJ-tesla_model_3.json.offline.js",
-   "bytes": 2210668,
-   "sha256": "78ccbccdfe4cfcf4203ec8e5afbbdbdb2352c6bbc819dd6406ce554f4961e0e8"
+   "bytes": 548396,
+   "sha256": "26a22d840af8c0189f6c0c181230c28681064b9984a88c54afc7b6084e929a87"
   },
   {
    "path": "pages/world/models/OBJ-traffic_light.json.offline.js",
@@ -1057,8 +1072,8 @@
   },
   {
    "path": "pages/world/models/S3D-myo_armband.json.offline.js",
-   "bytes": 22796,
-   "sha256": "455e0ce7d5ae8dfcdc77119149b8f549cc4eb08a6dff67ee1165bce68117f35b"
+   "bytes": 21836,
+   "sha256": "0e8f1a1013f42d6cfdc6b8fde7b29bbe20b9d2add32714fac5351c519b4121c9"
   },
   {
    "path": "pages/world/models/SR-accessory_eyeglasses_a01.json.offline.js",
@@ -1072,8 +1087,8 @@
   },
   {
    "path": "pages/world/models/SR-blinds_window_2m_open_a01.json.offline.js",
-   "bytes": 1474406,
-   "sha256": "ed58fff5d01547c0a18048d8f866ce8d7d8d16657f56b4cd657350e6f26f6a4f"
+   "bytes": 1005678,
+   "sha256": "314e7f2624ea241090d201c67dfcfc92fdc78edbe42bf3c5a68058909d15a1ea"
   },
   {
    "path": "pages/world/models/SR-bottle_laboratory_b01.json.offline.js",
@@ -1157,8 +1172,8 @@
   },
   {
    "path": "pages/world/models/SR-engineAssembly_electric_engine_a01.json.offline.js",
-   "bytes": 1999728,
-   "sha256": "e30a0c695bbe68bd895a047a05b2b1b58d0a9156d4a751ebf496bc0ea117a652"
+   "bytes": 467380,
+   "sha256": "6a3f42bda49cbb1f0e39851ab2a6f8f191c917ab51a90a260ef837c3d336dc15"
   },
   {
    "path": "pages/world/models/SR-equipment_powerStrip_portable_c01.json.offline.js",
@@ -1167,8 +1182,8 @@
   },
   {
    "path": "pages/world/models/SR-humidifier_a01.json.offline.js",
-   "bytes": 499612,
-   "sha256": "2488e4183bc61f8ac115b9f1d01818148329ce983c7ce54be9cf1fb2beb7d12b"
+   "bytes": 313768,
+   "sha256": "45eb4d4396309881fa954848ba6184acdf5e05cf31da59a5ea70db6d10120956"
   },
   {
    "path": "pages/world/models/SR-kitchenware_jug_a01.json.offline.js",
@@ -1187,8 +1202,8 @@
   },
   {
    "path": "pages/world/models/SR-misc_bottle_corked_a01.json.offline.js",
-   "bytes": 734952,
-   "sha256": "6134a5341abe9bb35a5fdf2dbafbbcf2c274c6fdc273a2f091e01cb213ec68ce"
+   "bytes": 493416,
+   "sha256": "8bcc7a1c2d04e780402eed7b2949f857c972b2dd4362bffb602fb64395b724f6"
   },
   {
    "path": "pages/world/models/SR-misc_glass_vase_a01.json.offline.js",
@@ -1217,8 +1232,8 @@
   },
   {
    "path": "pages/world/models/SR-TV_a01.json.offline.js",
-   "bytes": 702176,
-   "sha256": "d0e20607c01a10fbd78354c751054b2d0847a04b808e93c94debe48a30ec3f82"
+   "bytes": 458376,
+   "sha256": "f233dc1211fd3519921e93ac932c44c46b3f26d3bc37f5809b79d523248c66e1"
   },
   {
    "path": "pages/world/models/SR-water_cooler_a01.json.offline.js",
@@ -1227,8 +1242,8 @@
   },
   {
    "path": "pages/world/models/T02.json.offline.js",
-   "bytes": 211296,
-   "sha256": "a04183b8b781025ca883ee8290590bc987b5e6592f8f21bcd64fef1ee143a05b"
+   "bytes": 198592,
+   "sha256": "78dd08a0ad6d87e27bceeb270fd11383bd0f4d13964341f4953491f47d8d0d7d"
   },
   {
    "path": "pages/world/models/T04.json.offline.js",
@@ -1502,8 +1517,8 @@
   },
   {
    "path": "README.md",
-   "bytes": 1797,
-   "sha256": "ec1d3fee19f30ddf6f14715f3266f08bf7dfe7c7121a5bd415ddb6055aa6364b"
+   "bytes": 1860,
+   "sha256": "4f001b550492b7babc5ca73997f8bfbb7b73501b9fda776118093db3c5d84f9d"
   }
  ],
  "notes": [],
