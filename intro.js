@@ -1,6 +1,6 @@
 /* Sense2Sim landing: the way into the Sensing Universe and the Sensing World.
    One scene, driven by the page's scroll (eased, so it plays fluidly both ways):
-     1  three papers' first pages, large, under the title
+     1  three first pages, large, under the title (their titles are general and made up: no paper's name)
      2  the view pulls back: more and more papers, smaller and smaller, a wall of them, nearer and farther
         ones moving apart (parallax)
      3  each paper shrinks to a star and flies to its place in the Sensing Universe: the galaxies of the LLAP
@@ -59,7 +59,7 @@
   var MODS = DATA.mods, COUNTS = DATA.counts, HEROES = DATA.heroes || [];
   var N = 0, OFF = [];
   COUNTS.forEach(function (n) { OFF.push(N); N += n; });
-  // the sheets that carry their real title ([paper, title, venue, authors]) and each paper's short name
+  // the sheets that carry a title ([paper, title]: a general, made-up one, no paper's own) and each paper's short name
   var TITLED = (DATA.titled || []).filter(function (t) { return t && t[0] >= 0 && t[0] < N && t[1]; });
   var NAMES = DATA.names || [];
   var colNight = new Float32Array(21), colSheet = new Float32Array(21);
@@ -109,7 +109,7 @@
     cells.length = N;
     var heroOf = new Int16Array(N).fill(-1), order = [], taken = {};
     HEROES.forEach(function (h, j) { var k = OFF[h.g] + h.i; if (k >= 0 && k < N && !taken[k]) { taken[k] = 1; heroOf[k] = j; order.push(k); } });
-    // (then the sheets with a real title, round them: 100 and up)
+    // (then the sheets with a title, round them: 100 and up)
     TITLED.forEach(function (t, j) { var k = t[0]; if (!taken[k]) { taken[k] = 1; heroOf[k] = 100 + j; order.push(k); } });
     var rest = []; for (var k = 0; k < N; k++) if (!taken[k]) rest.push(k);
     var R = rng(77); for (var i = rest.length - 1; i > 0; i--) { var j2 = Math.floor(R() * (i + 1)), t = rest[i]; rest[i] = rest[j2]; rest[j2] = t; }
@@ -301,10 +301,11 @@
     });
   }
 
-  // ---------------------------------------------------------------- the named papers' first pages, drawn once
-  // A sheet in the look of a conference paper: where it appeared, its title, its authors, then two columns of
-  // lines standing for its text (no words of the paper beyond its title page's) and a figure in its kind's colour.
-  var SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif', SERIF = 'Georgia, "Times New Roman", Times, serif';
+  // ---------------------------------------------------------------- the front sheets, drawn once
+  // A sheet in the look of a conference paper's first page: a title, shapes where its authors stand, then two
+  // columns of lines standing for its text and a figure in its kind's colour. It names no paper and no one
+  // (AmI, 2026-11-17: "都改成general的瞎编的题目"): the title is a general, made-up one from intro-data.js.
+  var SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
   function wrapText(g, text, maxW) {
     var words = String(text).split(/\s+/), lines = [], cur = "";
     words.forEach(function (w) { var t = cur ? cur + " " + w : w; if (cur && g.measureText(t).width > maxW) { lines.push(cur); cur = w; } else cur = t; });
@@ -316,28 +317,19 @@
     var u = w / 1000, R = rng(seed), tint = MOD_SHEET[MODS[hero.g]] || "#7d8799", cx = x0 + w / 2;
     g.fillStyle = "#f8f8f4"; g.fillRect(x0, y0, w, h);
     g.textAlign = "center"; g.textBaseline = "alphabetic";
-    g.fillStyle = "#70747c"; g.font = "500 " + 17 * u + "px " + SANS; g.fillText(hero.venue || "", cx, y0 + 0.064 * h);
-    var ts = 47, lines;
-    do { g.font = "700 " + ts * u + "px " + SANS; lines = wrapText(g, hero.title, 820 * u); ts -= 4; } while (lines.length > 3 && ts > 26);
-    ts += 4; var y = y0 + 0.064 * h + (ts + 26) * u;
+    var ts = 51, lines;
+    do { ts -= 4; g.font = "700 " + ts * u + "px " + SANS; lines = wrapText(g, hero.title || "", 820 * u); } while (lines.length > 3 && ts > 26);
+    var y = y0 + 0.058 * h + ts * u;
     g.fillStyle = "#16181c";
     lines.forEach(function (ln) { g.fillText(ln, cx, y); y += ts * 1.16 * u; });
     y += 14 * u;
-    var au = hero.authors || [];
-    if (au.length <= 6) {
-      var per = Math.min(3, Math.max(1, au.length)), cw = 820 / per;
-      au.forEach(function (a, i) {
-        var col = i % per, row = Math.floor(i / per), nIn = Math.min(per, au.length - row * per);
-        var ax = cx + (col - (nIn - 1) / 2) * cw * u, ay = y + row * 62 * u;
-        g.fillStyle = "#1d2025"; g.font = "500 " + 21 * u + "px " + SERIF; g.fillText(fitText(g, a[0], (cw - 16) * u), ax, ay + 20 * u);
-        g.fillStyle = "#6c7078"; g.font = "400 " + 15.5 * u + "px " + SERIF; g.fillText(fitText(g, a[1] || "", (cw - 16) * u), ax, ay + 42 * u);
-      });
-      y += Math.ceil(au.length / per) * 62 * u;
-    } else {
-      g.fillStyle = "#1d2025"; g.font = "500 " + 19.5 * u + "px " + SERIF;
-      wrapText(g, au.map(function (a) { return a[0]; }).join(", "), 800 * u).slice(0, 3).forEach(function (ln) { g.fillText(ln, cx, y + 20 * u); y += 29 * u; });
-      y += 8 * u;
+    // (its authors and their places as shapes, no one's names)
+    for (var ai = 0; ai < 3; ai++) {
+      var gx = cx + (ai - 1) * 273 * u, nw = (112 + 30 * R()) * u;
+      g.fillStyle = "#3a3d43"; g.globalAlpha = 0.72; g.fillRect(gx - nw / 2, y + 8 * u, nw, 10 * u);
+      g.fillStyle = "#8a8d93"; g.globalAlpha = 0.8; g.fillRect(gx - 84 * u, y + 32 * u, 168 * u, 7 * u);
     }
+    g.globalAlpha = 1; y += 62 * u;
     // the two columns, set as a conference paper's first page is: an abstract, the concepts and keywords, the
     // reference line, the introduction and the note at the left column's foot; a figure and its caption, then
     // text, on the right. The text is no paper's: each line is drawn as words' shapes, justified, a paragraph's
@@ -396,18 +388,24 @@
     yl = words(1, yl + pitch * 0.8, top + fh + (bottom - top - fh) * 0.6);
     part(1, yl, 0.6, "2   BACKGROUND", bottom);
   }
-  // a titled sheet's head alone (where it appeared, its title, its authors): the sheet's lines are drawn in the shader
+  // a titled sheet's head alone (its made-up title, shapes for its authors): the sheet's lines are drawn in the shader
   function drawHead(g, x0, y0, w, h, t) {
     var cx = x0 + w / 2, pad = 12;
     g.textAlign = "center"; g.textBaseline = "alphabetic";
-    g.fillStyle = "#8a8a8a"; g.font = "500 11px " + SANS; g.fillText(fitText(g, t[2] || "", w - 2 * pad), cx, y0 + 15);
     var ts = 27, lines;
     do { ts -= 2; g.font = "700 " + ts + "px " + SANS; lines = wrapText(g, t[1], w - 2 * pad); } while (lines.length > 3 && ts > 13);
     if (lines.length > 3) { lines.length = 3; lines[2] = fitText(g, lines[2] + " …", w - 2 * pad); }
-    var y = y0 + 19 + ts;
+    var y = y0 + 9 + ts;
     g.fillStyle = "#000";
     lines.forEach(function (ln) { g.fillText(ln, cx, y); y += ts * 1.14; });
-    if (y - ts * 1.14 + 22 <= y0 + h - 4) { g.fillStyle = "#555"; g.font = "500 12.5px " + SERIF; g.fillText(fitText(g, t[3] || "", w - 2 * pad), cx, y - ts * 1.14 + 21); }
+    y -= ts * 1.14;
+    if (y + 27 <= y0 + h - 2) {
+      for (var ai = 0; ai < 3; ai++) {
+        var ax = cx + (ai - 1) * 108, nw = 44 + 14 * hash2(t[0], ai);
+        g.fillStyle = "#4a4a4a"; g.fillRect(ax - nw / 2, y + 12, nw, 5);
+        g.fillStyle = "#8c8c8c"; g.fillRect(ax - 34, y + 22, 68, 3.5);
+      }
+    }
   }
   function makeHeads() {
     var n = Math.max(1, TITLED.length), cw = 384, chh = 128, max = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 2048;
