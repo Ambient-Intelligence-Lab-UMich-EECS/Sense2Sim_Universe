@@ -11,6 +11,8 @@
 // page and in its 3-D space
 try { const t = new URLSearchParams(location.search).get("theme") || localStorage.getItem("senseweaver-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
+<!-- the page's entrance: a point cloud that forms as the first space loads (entrance.js); before the styles and the fonts, so it is there at once -->
+<script src="entrance.js" data-title="Sensing World" data-shape="world" data-hold data-line="Loading the space" data-night="#04070d" data-day="#f4f6fa"></script>
 <style>/* fonts: Google Fonts' rules, each file served beside the page (unicode-range: only the subsets the text needs) */
 /* cyrillic-ext */
 @font-face {
