@@ -73,20 +73,18 @@ button, select, input { font: inherit; color: inherit; }
 /* the spaces wrap onto as many lines as they need: no scroll bar (the user, 2026-11-13: "no drag bar for the scenarios") */
 /* the spaces as icon tiles, in their groups: each group's label over its row of tiles */
 /* sixteen tiles in one row at 1400 px (76 px each, 12 px between groups) */
-.tabs { display: flex; flex-wrap: wrap; gap: 14px 12px; align-items: flex-start; }
+.tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 12px; align-items: flex-start; } /* centred on the page, each wrapped row too (the user, 2026-11-17: "上面的菜单能不能重新居中一下") */
 .tab-group { display: grid; gap: 7px; min-width: 0; }
 .tg-label { font: 600 10.5px/1.2 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 0 2px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 .tg-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .tabs button { width: 76px; height: 92px; display: grid; grid-template-rows: 26px 1fr auto; justify-items: center; align-items: center; gap: 4px; padding: 10px 4px 9px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s; }
 .tabs button svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; color: var(--muted); }
 .tabs button .t { font: 600 12.5px/1.15 var(--body); }
-.tabs button .n { font: 10.5px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 .tabs button:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 22px rgb(0 0 0 / 0.22); }
 .tabs button:hover svg { color: var(--accent); }
 /* the space open: LLAP's "now", its border and its letters in the accent over the accent's wash */
 .tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; transform: none; }
 .tabs button[aria-selected="true"] svg { color: var(--accent); }
-.tabs button[aria-selected="true"] .n { color: var(--ink-2); }
 @media (max-width: 520px) { .tabs { gap: 12px 14px; } .tabs button { width: 74px; height: 88px; padding: 9px 3px 8px; } }
 
 .space-head { display: grid; gap: 10px; }
@@ -150,7 +148,7 @@ button, select, input { font: inherit; color: inherit; }
 .tip[hidden] { display: none; }
 
 /* the guide */
-.guide { display: grid; gap: 10px; align-content: start; max-height: calc(72vh + 60px); overflow-y: auto; padding-right: 4px; scrollbar-width: thin; min-width: 0; }
+.guide { display: grid; gap: 10px; align-content: start; min-width: 0; } /* as tall as what it holds, no scroll bar of its own (the user, 2026-11-17: "KG不要上下拖动的bar"): the page scrolls */
 .guide h3 { font-size: 20px; }
 .guide h4 { font: 600 11px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 8px 0 0; }
 .guide h4 small { font: 11px var(--mono); letter-spacing: 0; margin-left: 4px; }
@@ -171,93 +169,107 @@ button, select, input { font: inherit; color: inherit; }
 .g-ph .go { margin-left: auto; color: var(--muted); }
 /* a room's or a thing's papers as a graph (the Sensing World page's "Same use, other setups"): the hub in the middle,
    device-free papers left, device-based right, a dot in the paper's modality's colour, ringed when simulated here */
-.kg { display: grid; gap: 8px; }
+/* ---- the side graph (redesigned 2026-11-17, the user: "重新设计一下KG的页面" … "不好看"): one kind of block for a
+   paper in both views, soft tinted bars for sensors and targets, a dark pill for what is open, plain small headings,
+   thin lines in each paper's modality colour; papers known by their authors in a fold under it ---- */
+.kg { display: grid; gap: 12px; }
 .kg-g { position: relative; }
-.kg-zone { position: absolute; top: 0; display: flex; align-items: center; gap: 7px; font: 500 12px/1 var(--body); color: var(--muted); }
-.kg-zone.l { left: 0; } .kg-zone.r { right: 0; }
-.kg-zone i { font: 600 10.5px/1 var(--mono); font-style: normal; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--line-strong); border-radius: 999px; padding: 6px 9px; }
+/* a graph wider than the guide (a phone, the widest rooms): it scrolls sideways in its own frame */
+.kg-xw { position: relative; min-width: 0; }
+.kg-xw::after { content: ""; position: absolute; top: 0; right: 0; bottom: 6px; width: 32px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; transition: opacity 0.2s; }
+.kg-xw.end::after { opacity: 0; }
+.kg-x { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; padding-bottom: 6px; }
+/* the views' switch: two halves of one control */
+.kg-views { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 3px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.kg-views button { border: 0; background: none; border-radius: 8px; padding: 6px 10px; font: 600 12px/1.2 var(--body); color: var(--muted); cursor: pointer; transition: color 0.15s, background 0.15s, box-shadow 0.15s; }
+.kg-views button:hover { color: var(--ink); }
+.kg-views button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12), 0 0 0 1px var(--line); }
+.kg-views button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* a column's heading: small, plain */
+.kg-col, .kg-th { position: absolute; margin: 0; transform: translateY(-50%); font: 600 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.kg-col { top: 8px; }
+.kg-th { display: flex; align-items: center; gap: 6px; font-size: 9.5px; }
+.kg-th::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--tint); }
+/* the lines: each paper's, in its modality's colour */
 .kg-e { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
-.kg-e .mid { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 3 4; }
-.kg-e .e { fill: none; transition: opacity 0.2s, stroke 0.2s; }
-.kg-e .e.u { stroke: var(--c); stroke-width: 1.6; opacity: 0.45; }
-.kg-e .e.c { stroke: var(--muted); stroke-width: 1.3; stroke-dasharray: 3 4; opacity: 0.6; }
+.kg-e .e { fill: none; transition: opacity 0.2s, stroke-width 0.2s; }
+.kg-e .e.u { stroke: var(--c); stroke-width: 1.4; opacity: 0.38; }
+.kg-e .e.c { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 2 4; stroke-linecap: round; opacity: 0.6; }
 .kg-e marker path { fill: var(--muted); }
-.kg.hot .kg-e .e { opacity: 0.07; }
-.kg.hot .kg-e .e.on { opacity: 1; }
+.kg.hot .kg-e .e { opacity: 0.06; }
+.kg.hot .kg-e .e.on { opacity: 0.95; stroke-width: 2; }
 .kg.hot .kg-e .e.c.on { stroke: var(--ink); }
-.kg-hub { position: absolute; transform: translateY(-50%); padding: 8px 6px 9px; border-radius: 14px; border: 1px solid var(--line-strong); background: var(--card); text-align: center; box-shadow: 0 10px 28px rgb(0 0 0 / 0.22); }
-.kg-hub small { display: block; margin-bottom: 4px; font: 600 9.5px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.kg-hub span { display: block; font: 600 13px/1.2 var(--display); overflow-wrap: anywhere; }
-/* the hub leads back up: a device to its room, a room to all rooms */
-button.kg-hub { color: var(--ink); cursor: pointer; transition: border-color 0.15s; }
-button.kg-hub:hover, button.kg-hub:focus-visible { border-color: var(--accent); outline: none; }
-.kg-hub em { display: block; margin-top: 5px; font: 10.5px/1.2 var(--mono); font-style: normal; color: var(--muted); }
-button.kg-hub:hover em, button.kg-hub:focus-visible em { color: var(--accent); }
-/* the paper picked: its dot ringed in ink, and a line under the graph */
-.kg-n.pick i { box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--ink); }
-.kg-n.pick b { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+/* what is open: a dark pill; it leads back up (a device to its room, a room to all rooms) */
+.kg-hub { position: absolute; transform: translateY(-50%); height: 30px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--ink); color: var(--panel); text-align: center; white-space: nowrap; box-shadow: 0 6px 16px rgb(0 0 0 / 0.18); cursor: pointer; transition: box-shadow 0.15s; }
+.kg-hub span { font: 600 calc(12.5px * var(--k, 1))/30px var(--display); }
+.kg-hub:hover, .kg-hub:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent), 0 6px 16px rgb(0 0 0 / 0.18); }
+/* a paper: a block, its name whole on one line, a dot in its modality's colour (ringed where it is simulated here) */
+.kg-n { position: absolute; display: grid; align-items: center; column-gap: 8px; height: 28px; padding: 0 10px; transform: translateY(-50%); border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgb(0 0 0 / 0.04); transition: opacity 0.2s, border-color 0.15s, background 0.15s; animation: kgin 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--d, 0) * 30ms); }
+@keyframes kgin { from { opacity: 0; transform: translateY(-50%) scale(0.95); } }
+.kg-n, .kg-n.r, .kg-n.m { grid-template-columns: 8px minmax(0, auto); justify-content: start; }
+.kg-n.l { grid-template-columns: minmax(0, auto) 8px; justify-content: end; }
+.kg-n.l i { grid-column: 2; grid-row: 1; } .kg-n.l b { grid-column: 1; grid-row: 1; text-align: right; }
+.kg-n i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); transition: transform 0.2s; }
+.kg-n.sim i { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 30%, transparent); }
+.kg-n b { font: 600 calc(12px * var(--k, 1))/1 var(--display); white-space: nowrap; } /* whole, never cut (the user, 2026-11-17: "NO OMIT LIKE ...") */
+.kg-n:hover, .kg-n:focus-visible { outline: none; border-color: var(--c); background: color-mix(in srgb, var(--c) 7%, var(--card)); }
+.kg-n:hover i, .kg-n:focus-visible i { transform: scale(1.3); }
+.kg-n.pick { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.kg.hot .kg-n { opacity: 0.32; }
+.kg.hot .kg-n.on, .kg.hot .kg-n.near { opacity: 1; }
+.kg.hot .kg-n.on { border-color: var(--c); }
+.kg-none { position: absolute; margin: 0; transform: translateY(-50%); font: italic 12px/1.3 var(--body); color: var(--muted); white-space: nowrap; }
+.kg-empty { margin: 4px 0; font: italic 12.5px/1.4 var(--body); color: var(--muted); }
+/* a sensor, a target: a soft bar, its words whole on one line; a sensor's blue, a person's green, an object's grey */
+.kg-t { position: absolute; transform: translateY(-50%); display: flex; align-items: center; height: 26px; padding: 0 9px; white-space: nowrap; border-radius: 8px; background: var(--tint); font-size: calc(11px * var(--k, 1)); line-height: 1; color: var(--ink); cursor: default; transition: opacity 0.2s, box-shadow 0.15s; animation: kgin 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--d, 0) * 30ms); }
+.kg-t b { font-weight: 550; }
+.kg-t.s { justify-content: flex-end; }
+.kg-t.s, .kg-th.s { --tint: color-mix(in srgb, var(--second) 14%, transparent); }
+.kg-t.h, .kg-th.h { --tint: color-mix(in srgb, var(--accent) 17%, transparent); }
+.kg-t.o, .kg-th.o { --tint: color-mix(in srgb, var(--ink) 8%, transparent); }
+.kg-t:hover { box-shadow: inset 0 0 0 1px var(--line-strong); }
+.kg.hot .kg-t { opacity: 0.32; }
+.kg.hot .kg-t.on, .kg.hot .kg-t.near { opacity: 1; }
+.kg.hot .kg-t.on { box-shadow: inset 0 0 0 1.5px var(--ink); }
+@media (prefers-reduced-motion: reduce) { .kg-n, .kg-t { animation: none; } }
+/* under the graph: the modalities, or the line of what is pointed at */
+.kg-foot { display: grid; min-height: 30px; }
+.kg-foot > * { grid-area: 1 / 1; margin: 0; }
+.kg-leg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 6px; font: 11px/1 var(--mono); color: var(--muted); transition: opacity 0.2s; }
+.kg-leg .lc { width: 16px; border-top: 2px dotted var(--muted); }
+.kg-leg .lm { width: 8px; height: 8px; margin-left: 6px; border-radius: 50%; background: var(--c); }
+.kg-leg .lm:first-child { margin-left: 0; }
+.kg-leg .lsep { width: 1px; height: 12px; margin: 0 4px; background: var(--line); }
+.kg-cap { font-size: 12.5px; line-height: 1.4; color: var(--ink); opacity: 0; transition: opacity 0.2s; }
+.kg.hover .kg-cap { opacity: 1; }
+.kg.hover .kg-leg { opacity: 0; } /* a paper picked keeps the legend; pointed at, its line takes its place */
+.kg-more { justify-self: start; border: 1px solid var(--line-strong); background: transparent; color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; font: 600 12.5px/1.2 var(--body); }
+.kg-more:hover { border-color: var(--ink); }
+/* the papers known by their authors: a fold, each its first author and year, and its title */
+.kg-fold { border-top: 1px solid var(--line); padding-top: 10px; }
+.kg-fold summary { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; font: 600 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.kg-fold summary::-webkit-details-marker { display: none; }
+.kg-fold summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s; }
+.kg-fold[open] summary::before { transform: rotate(45deg); }
+.kg-fold summary:hover { color: var(--ink); }
+.kg-fold ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 1px; }
+.kg-fold li button { display: grid; grid-template-columns: 8px auto minmax(0, 1fr); align-items: baseline; column-gap: 10px; width: 100%; padding: 6px 8px; border: 0; border-radius: 7px; background: none; color: var(--ink); text-align: left; cursor: pointer; font: 12px/1.35 var(--body); }
+.kg-fold li button:hover, .kg-fold li button:focus-visible { outline: none; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.kg-fold li button.pick { background: color-mix(in srgb, var(--c) 10%, transparent); }
+.kg-fold li i { align-self: center; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.kg-fold li b { font-weight: 600; white-space: nowrap; }
+.kg-fold li span { color: var(--muted); }
+/* the paper picked: its block over the graph */
 .kg-pick { display: grid; gap: 5px; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--line); border-left: 3px solid var(--c); background: var(--card); font-size: 12.5px; }
 .kg-pick b { font: 600 14px var(--display); }
 .kg-pick small { font: 11px var(--mono); color: var(--muted); }
 .kg-pick .says { color: var(--muted); }
+.kg-pick .ttl { font-size: 12.5px; line-height: 1.35; color: var(--ink); } /* the paper's own title, under its short name */
 .kg-pick .rows { display: grid; gap: 3px; }
 .kg-pick .rows b { display: inline-block; min-width: 58px; margin-right: 6px; font: 600 10px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.kg-pick .rows i { font-style: normal; text-decoration: underline dotted color-mix(in srgb, var(--muted) 70%, transparent); text-underline-offset: 3px; cursor: help; } /* where the paper says it, on pointing */
 .kg-pick .links { display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .kg-pick a { color: var(--accent); text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); text-underline-offset: 2px; }
-.kg-n { position: absolute; display: grid; align-items: center; column-gap: 8px; row-gap: 1px; padding: 2px 0; transform: translateY(-50%); border: 0; background: none; color: var(--ink); cursor: pointer; transition: opacity 0.2s; animation: kgin 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--d, 0) * 40ms); }
-@keyframes kgin { from { opacity: 0; transform: translateY(-50%) scale(0.92); } }
-.kg-n.l { grid-template-columns: minmax(0, 1fr) 20px; text-align: right; }
-.kg-n.r { grid-template-columns: 20px minmax(0, 1fr); text-align: left; }
-.kg-n i { grid-row: 1 / 3; justify-self: center; width: 11px; height: 11px; border-radius: 50%; background: var(--c); transition: transform 0.2s; }
-.kg-n.l i { grid-column: 2; }
-.kg-n.l b, .kg-n.l span { grid-column: 1; }
-.kg-n b { font: 600 13.5px/1.15 var(--display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.kg-n span { font-size: 11px; line-height: 1.25; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.kg-n.sim i { width: 14px; height: 14px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 28%, transparent); }
-.kg-n.sim b { font-size: 14.5px; }
-.kg-n:hover i, .kg-n:focus-visible i { transform: scale(1.35); }
-.kg-n:hover b, .kg-n:focus-visible b { text-decoration: underline; text-underline-offset: 3px; }
-.kg-n:focus-visible { outline: none; }
-.kg.hot .kg-n { opacity: 0.3; }
-.kg.hot .kg-n.on, .kg.hot .kg-n.near { opacity: 1; }
-.kg-none { position: absolute; margin: 0; transform: translateY(-50%); font: italic 12px/1.3 var(--body); color: var(--muted); }
-.kg-none.l { text-align: right; padding-right: 14px; } .kg-none.r { padding-left: 14px; }
-.kg-foot { display: grid; min-height: 34px; }
-.kg-foot > * { grid-area: 1 / 1; }
-.kg-leg { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 6px; font: 11px/1 var(--mono); color: var(--muted); transition: opacity 0.2s; }
-.kg-leg .lu { width: 16px; height: 2px; background: var(--muted); }
-.kg-leg .lc { width: 16px; margin-left: 6px; border-top: 2px dashed var(--muted); }
-.kg-leg .lm { width: 9px; height: 9px; margin-left: 4px; border-radius: 50%; background: var(--c); }
-.kg-leg .lsep { width: 1px; height: 12px; margin: 0 4px; background: var(--line); }
-.kg-cap { font-size: 12.5px; line-height: 1.35; color: var(--ink); opacity: 0; transition: opacity 0.2s; }
-.kg.hover .kg-cap { opacity: 1; }
-.kg.hover .kg-leg { opacity: 0; } /* a paper picked keeps the legend; pointed at, its line takes its place */
-.kg-more { justify-self: start; border: 1px solid var(--line-strong); background: var(--panel); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 13px; font-weight: 600; }
-.kg-more:hover { border-color: var(--accent); }
-/* the graph's two views, a switch over it (the user, 2026-11-17): by subject or object, by sensor and target */
-.kg-views { display: inline-flex; justify-self: start; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
-.kg-views button { border: 0; background: none; border-radius: 999px; padding: 5px 12px; font: 600 12px/1.2 var(--body); color: var(--muted); cursor: pointer; transition: color 0.15s, background 0.15s; }
-.kg-views button:hover { color: var(--ink); }
-.kg-views button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgb(0 0 0 / 0.16), 0 0 0 1px var(--line); }
-.kg-views button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-/* by sensor and target: each paper a box in the middle column; the sensors and the targets chips at its sides */
-.kg-n.m { grid-template-columns: 12px minmax(0, 1fr); column-gap: 6px; padding: 5px 8px 5px 6px; text-align: left; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
-.kg-n.m i { width: 10px; height: 10px; }
-.kg-n.m.sim i { width: 12px; height: 12px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 28%, transparent); }
-.kg-n.m b, .kg-n.m.sim b { font-size: 12px; line-height: 1.2; white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.kg-n.m:hover, .kg-n.m:focus-visible { border-color: var(--c); }
-.kg-n.m.pick { border-color: var(--ink); }
-.kg-g.narrow .kg-n.m b { font-size: 11.5px; }
-.kg-t { position: absolute; transform: translateY(-50%); display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 9px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--panel); font-size: 11px; line-height: 14px; color: var(--ink); cursor: default; transition: opacity 0.2s, border-color 0.15s; animation: kgin 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--d, 0) * 40ms); }
-.kg-t.s { flex-direction: row-reverse; text-align: right; }
-.kg-t b { font-weight: 600; overflow-wrap: break-word; min-width: 0; }
-.kg-t small { font: 10px/1 var(--mono); color: var(--muted); }
-.kg-t:hover { border-color: var(--accent); }
-.kg.hot .kg-t { opacity: 0.3; }
-.kg.hot .kg-t.on, .kg.hot .kg-t.near { opacity: 1; }
-.kg.hot .kg-t.on { border-color: var(--accent); }
-.kg-th { position: absolute; margin: 0; transform: translateY(-50%); font: 600 10px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-@media (prefers-reduced-motion: reduce) { .kg-n, .kg-t { animation: none; } }
 .tag { font: 500 11px/1 var(--mono); padding: 4px 8px; border-radius: 999px; border: 1px solid var(--line-strong); }
 .tag.threat { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); }
 .g-back { justify-self: start; border: 0; background: none; padding: 2px 0; cursor: pointer; color: var(--muted); font-size: 13px; }
@@ -297,9 +309,9 @@ button.kg-hub:hover em, button.kg-hub:focus-visible em { color: var(--accent); }
 
 /* a room: its view large beside a narrower guide */
 @media (min-width: 981px) {
-  .work:not(.wide) { grid-template-columns: minmax(0, 2.4fr) minmax(300px, 1fr); }
+  .work:not(.wide) { grid-template-columns: minmax(0, 1.6fr) minmax(340px, 1fr); } /* the 3-D view wide (the user, 2026-11-17: "the 3d one is too narrow"); the graph's papers short-named to fit */
   .work:not(.wide) .view { aspect-ratio: auto; height: clamp(440px, 76vh, 920px); max-height: none; }
-  .work:not(.wide) .guide { max-height: calc(clamp(440px, 76vh, 920px) + 56px); }
+  .work:not(.wide) .stage { position: sticky; top: 12px; } /* the view stays in sight while a long graph beside it scrolls with the page */
 }
 
 @media (max-width: 980px) {

@@ -1,13 +1,13 @@
 {
  "tool": "tools/offline.mjs",
- "made": "2026-11-18T00:43:44.175Z",
+ "made": "2026-11-18T01:12:44.734Z",
  "about": [
   "Sense2Sim Universe: the Sensing Universe and the Sensing World, shared by every Sense2Sim paper page",
   "Sensing Universe: the SenseWeaver knowledge base, 1,401 papers and 42 considered (updated 2026-11-17); the Model rating filter starts with A and B",
-  "Sensing World: its spaces as of 2026-11-17, built from SenseWeaver main c1070103 (unified/all/spaces/sim)",
+  "Sensing World: its spaces as of 2026-11-17, built from SenseWeaver main e1fef923 (unified/all/spaces/sim)",
   "3D models from the SenseWeaver asset pack (pack of 2026-11-12); credits and licences in CREDITS.md",
   "The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, 9836c12)",
-  "Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0)"
+  "Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0); the Sensing World packed again the same day (cc67d89)"
  ],
  "source": {
   "index": {
@@ -602,8 +602,8 @@
   },
   {
    "path": "pages/world/index.html",
-   "bytes": 4410300,
-   "sha256": "ed0e25d05adfbf63b5bc0c2fb5aacf8293f79dc74bb1d9c4e0e430f70b77aecf"
+   "bytes": 4683837,
+   "sha256": "5de18596343c4b0f1bc155b24575646fe15300247cba96b95591e85571d61b21"
   },
   {
    "path": "pages/world/models/A26.json.offline.js",
@@ -1317,8 +1317,8 @@
   },
   {
    "path": "pages/world/style.css",
-   "bytes": 30551,
-   "sha256": "404ae611d66f3883b508a5a90ffa16dcb1de8415369e8d174adfd369fb9d05e5"
+   "bytes": 32534,
+   "sha256": "e6fea7b44a5a6021c6078678b631fe2e12b7c6a09e23ec442d828185ba342500"
   },
   {
    "path": "pages/world/textures/TEX-clean_asphalt/color.webp",
@@ -1517,8 +1517,8 @@
   },
   {
    "path": "README.md",
-   "bytes": 1860,
-   "sha256": "4f001b550492b7babc5ca73997f8bfbb7b73501b9fda776118093db3c5d84f9d"
+   "bytes": 1915,
+   "sha256": "23f0552e2ef440d91e55f99c25cf70b090dbfac6c179c15fb8a7e6a235d098d5"
   }
  ],
  "notes": [],
