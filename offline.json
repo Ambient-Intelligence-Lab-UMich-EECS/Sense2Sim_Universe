@@ -1,6 +1,6 @@
 {
  "tool": "tools/offline.mjs",
- "made": "2026-11-18T02:28:27.915Z",
+ "made": "2026-11-18T03:01:42.764Z",
  "about": [
   "Sense2Sim Universe: the Sensing Universe and the Sensing World, shared by every Sense2Sim paper page",
   "Sensing Universe: the SenseWeaver knowledge base, 1,401 papers and 42 considered (updated 2026-11-17); the Model rating filter starts with A and B",
@@ -8,7 +8,7 @@
   "3D models from the SenseWeaver asset pack (pack of 2026-11-12); credits and licences in CREDITS.md",
   "The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, ca64fb6)",
   "Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0)",
-  "Semantic search (senseweaver-models tools/semantic, 63d2dde): only on the published site; opened from the disk, the pages work as before, without it"
+  "Semantic search (senseweaver-models tools/semantic, e8f5d0a): only on the published site; opened from the disk, the pages work as before, without it"
  ],
  "source": {
   "index": {
@@ -21,9 +21,9 @@
   "pages/world: the module app.js inlined",
   "pages/world: 142 files read through the runtime, 39 pictures as data: URLs, 0 pictures as files, 1 files kept as they are",
   "pages/world: Google Fonts stylesheet inlined (53 font files)",
-  "pages/universe: the semantic search added after the packer (tools/semantic/patch-universe.py, 63d2dde), loading ../../semantic/client.js",
-  "pages/world: the semantic search added after the packer (tools/semantic/patch-world.py, 63d2dde), loading ../../semantic/client.js and ../../semantic/world-search.js",
-  "semantic/client.js, semantic/world-search.js: from tools/semantic (63d2dde); the rest of semantic/ is only on the published site, and from the disk both stay off"
+  "pages/universe: the semantic search added after the packer (tools/semantic/patch-universe.py, e8f5d0a), loading ../../semantic/client.js",
+  "pages/world: the semantic search added after the packer (tools/semantic/patch-world.py, e8f5d0a), loading ../../semantic/client.js and ../../semantic/world-search.js",
+  "semantic/client.js, semantic/world-search.js: from tools/semantic (e8f5d0a); the rest of semantic/ is only on the published site, and from the disk both stay off"
  ],
  "vendor": [
   {
@@ -596,8 +596,8 @@
   },
   {
    "path": "pages/universe/index.html",
-   "bytes": 7570161,
-   "sha256": "87f60aa5b7731b3690ec76f6864e0572bd962c9a0f7299a87a2544d6a6770f4b"
+   "bytes": 7571711,
+   "sha256": "8aa9bf64aff477106e9e24ec6d00c9ec5d5f148612e502c95e0f5213b18478e7"
   },
   {
    "path": "pages/world/images.offline.js",
@@ -1522,17 +1522,17 @@
   {
    "path": "README.md",
    "bytes": 1964,
-   "sha256": "681056b703431d45ba5b9e2cc5800bd0ca527793797719be1515e6eaae25c37c"
+   "sha256": "766e82c77e84fbef058bef20a668b5c0950968c8ca0f06f83b7e80d091b2e152"
   },
   {
    "path": "semantic/client.js",
-   "bytes": 4469,
-   "sha256": "e80c98c87a63fcb987acd6e364ac55812cac2537003d1b1905bca2fc475be832"
+   "bytes": 4659,
+   "sha256": "d2aeaccb44ba340fd9bd0f4cfbe90570a4fba3f7985c705859f8f0af94d7b5ee"
   },
   {
    "path": "semantic/world-search.js",
-   "bytes": 8015,
-   "sha256": "4df6df1a431e69995540108a127a6adde9a06fa7e77a567ca097f2b61c98295a"
+   "bytes": 8118,
+   "sha256": "bede466c9fdbc73ef8b13ddec9f6420a19fa99cb8efdf795fbd20445e9b7539c"
   }
  ],
  "notes": [],

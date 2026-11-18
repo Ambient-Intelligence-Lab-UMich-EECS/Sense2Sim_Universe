@@ -1,6 +1,8 @@
 // Search by meaning for the Sense2Sim pages (the Sensing Universe and the Sensing World). A classic script: it reads
 // the site's semantic/manifest.json and starts the module worker the manifest names, which does the work.
-// Opened from the disk (the offline zip) it stays off and fetches nothing: the page keeps its own search.
+// Where it cannot run (opened from the disk, as in the offline zip; no Worker, WebAssembly or fetch) it defines nothing
+// and fetches nothing, so the page is exactly as without it: its own search, and nothing that says otherwise (the
+// Universe's tour speaks of the search by meaning only where window.S2S_SEMANTIC is).
 //   S2S_SEMANTIC.init({ base, which: "universe" | "world", keys, idle })
 //     base: where semantic/ is (default: where this script was loaded from); keys: the page's own paper keys, to refuse an index
 //     made for other papers; idle: start when the page is idle (default), not at once
@@ -11,6 +13,7 @@
 //     S2S_SEMANTIC.keys: the index's paper keys once it is loaded (a Universe result's order indexes them); for the World,
 //     S2S_SEMANTIC.spaces (its spaces and rooms, named) and S2S_SEMANTIC.papers (key -> [name, title])
 (function () {
+  if (location.protocol === "file:" || typeof Worker === "undefined" || typeof WebAssembly === "undefined" || !window.fetch) return;
   var S = window.S2S_SEMANTIC = { state: "off", error: null, log: [], onstate: null };
   var worker = null, seq = 0, waiting = {}, ME = document.currentScript && document.currentScript.src;
   function set(state, extra) {
@@ -21,7 +24,6 @@
   function off(why) { if (worker) worker.terminate(); worker = null; set("off", { error: why }); for (var id in waiting) waiting[id](null); waiting = {}; }
   S.init = function (o) {
     o = o || {};
-    if (location.protocol === "file:" || typeof Worker === "undefined" || typeof WebAssembly === "undefined" || !window.fetch) return off("not on this page");
     var root = o.base ? new URL(o.base, location.href).href : ME ? new URL("./", ME).href : new URL("../../semantic/", location.href).href;
     var which = o.which || "universe";
     function go() {

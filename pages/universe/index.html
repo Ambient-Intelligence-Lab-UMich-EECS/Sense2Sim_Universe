@@ -350,6 +350,9 @@ nav.tabs button[aria-selected="true"] { color: var(--text); background: var(--ch
 #qsug .semfoot { color: var(--muted); font-size: 11.5px; padding: 4px 6px 2px; }
 #qsug .semfoot button { display: inline; width: auto; padding: 0; color: var(--link); font-size: 11.5px; text-decoration: underline; }
 #qsug .semfoot button:hover { background: transparent; }
+#search .semtag { position: absolute; right: 8px; top: 7px; font-size: 11px; line-height: 16px; color: var(--link); border: 1px solid color-mix(in srgb, var(--link) 50%, transparent); border-radius: 8px; padding: 0 6px; pointer-events: none; white-space: nowrap; }
+#search.semon kbd { display: none; }
+#search.semon #q { padding-right: 88px; }
 #search kbd { position: absolute; right: 8px; top: 7px; font: 11px/16px var(--mono); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
 .btn { flex: none; border: 1px solid var(--border); background: color-mix(in srgb, var(--panel) 88%, transparent); color: var(--text-2); border-radius: 9px; height: 32px; padding: 0 12px; white-space: nowrap; }
 .btn:hover { color: var(--text); }
@@ -603,7 +606,7 @@ body.sp-open #tip { display: none !important; }
     <div id="brand"><h1>SenseWeaver <span>knowledge base</span></h1></div>
     <nav class="tabs" role="tablist" aria-label="Views" id="tabs"></nav>
     <span class="spacer"></span>
-    <div id="search"><input id="q" type="search" placeholder="Title, author, institution, label…" autocomplete="off" aria-label="Search papers" aria-controls="qsug"><kbd>/</kbd><div id="qsug" class="card" hidden role="listbox" aria-label="Authors and institutions"></div></div>
+    <div id="search"><input id="q" type="search" placeholder="Title, author, institution, label…" autocomplete="off" aria-label="Search papers" aria-controls="qsug"><kbd>/</kbd><span class="semtag" hidden></span><div id="qsug" class="card" hidden role="listbox" aria-label="Authors and institutions"></div></div>
     <button class="btn" id="filterBtn" aria-expanded="false" aria-controls="filterPop" title="Narrow every view by group, modality, venue, years and more">Filter</button>
     <button class="btn" id="tourBtn" title="A one-minute guided tour of the page">Tour</button>
     <button class="btn" id="aboutBtn" title="Counts, coverage and sources">Overview</button>
@@ -878,28 +881,44 @@ function matches(p) {
 const shown = (listedOnly = false) => visible().filter(p => (!listedOnly || isCore(p)) && matches(p));
 
 // ───────────── search by meaning (only where the page includes the site's semantic/client.js) ─────────────
-// A query of two words or more, a Chinese one, or one that starts no word of any paper is also searched by meaning: the
+// Every query of two letters or more is also searched by meaning (AmI 2026-11-18), in English only (a query in Chinese
+// is the words' alone), except an author's or an institution's exact name (then exactly their papers, as before): the
 // site's index ranks every paper by how close its card and its abstract are to the query (a small sentence model in a
-// worker, fused with keywords; Chinese through a glossary into English), and the closest SEM_LIT that pass the filters
-// light up beside what the words find, closest first. Opened from the disk, or with an index made for other papers, the
-// search is the words alone, as before.
+// worker, fused with keywords), and the closest SEM_LIT that pass the filters light up beside what the words find. The
+// words' matches come first, then the papers found by meaning, each closest first; the search field says "by meaning".
+// Opened from the disk, or with an index made for other papers, the search is the words alone, as before.
 const SEMX = window.S2S_SEMANTIC || null, SEM_LIT = 30;
 const sem = { res: null, lit: new Set(), rank: new Map(), outside: 0, sort: true, seq: 0 };
 const hasCJK = t => /[\u3400-\u9fff\uf900-\ufaff]/.test(t || "");
 function semWanted() {
-  if (!SEMX || !state.q || state.qAuthor || state.qInst) return false;
-  return hasCJK(state.qRaw) || state.q.includes(" ") || !P.some(p => hay.get(p.key).includes(" " + state.q));
+  return !!SEMX && (state.q || "").length >= 2 && !state.qAuthor && !state.qInst && !hasCJK(state.qRaw);
 }
 const semOn = () => !!sem.res && sem.res.q === state.qRaw && semWanted();
 const byRel = (a, b) => (sem.rank.has(a.key) ? sem.rank.get(a.key) : 1e9) - (sem.rank.has(b.key) ? sem.rank.get(b.key) : 1e9);
+// what the words find (the page's own search)
+const wordHit = p => !!state.q && hay.get(p.key).includes(" " + state.q);
+// the words' matches first, then the papers found by meaning, each closest to the search first
+const byFound = (a, b) => wordHit(b) - wordHit(a) || byRel(a, b);
 // the lit papers under the filters as they are now (refresh() calls it first)
 function semRefresh() {
   sem.lit = new Set(); sem.rank = new Map(); sem.outside = 0;
-  if (!semOn()) return;
-  const keys = sem.res.order.map(i => SEMX.keys[i]).filter(k => byKey.has(k));
-  keys.forEach((k, r) => sem.rank.set(k, r));
-  for (const k of keys) { if (sem.lit.size >= SEM_LIT) break; if (passes(byKey.get(k))) sem.lit.add(k); }
-  sem.outside = keys.slice(0, SEM_LIT).filter(k => !passes(byKey.get(k))).length;
+  if (semOn()) {
+    const keys = sem.res.order.map(i => SEMX.keys[i]).filter(k => byKey.has(k));
+    keys.forEach((k, r) => sem.rank.set(k, r));
+    for (const k of keys) { if (sem.lit.size >= SEM_LIT) break; if (passes(byKey.get(k))) sem.lit.add(k); }
+    sem.outside = keys.slice(0, SEM_LIT).filter(k => !passes(byKey.get(k))).length;
+  }
+  semTag();
+}
+// the search field says when the search by meaning is on ("by meaning"), or on its way while the model loads
+function semTag() {
+  const t = document.querySelector("#search .semtag");
+  if (!t) return;
+  const on = semOn() && sem.res.semantic, wait = !on && semWanted() && (SEMX.state === "loading" || SEMX.state === "words");
+  t.hidden = !(on || wait);
+  t.textContent = on ? "by meaning" : "meaning…";
+  t.title = on ? `Also searched by meaning: the ${sem.lit.size} closest papers light up beside what the words find` : "The search by meaning is loading; the words answer meanwhile";
+  t.parentNode.classList.toggle("semon", !t.hidden);
 }
 // the query as typed, to the worker; only the answer to the newest one is kept
 function semSearch() {
@@ -915,7 +934,6 @@ function semSearch() {
 }
 const semHead = () => [!sem.rank.size ? "By meaning: no paper found yet" : sem.lit.size ? `By meaning: the ${sem.lit.size} closest papers light up, closest first`
   : "By meaning: the closest papers are all outside the filters",
-  sem.res.text && sem.res.text !== sem.res.q ? ` · searched as “${sem.res.text}”` : "",
   sem.res.semantic ? "" : " · keywords only while the model loads"].join("");
 
 // ───────────── nodes shared by map and graph ─────────────
@@ -1930,7 +1948,7 @@ function renderSug() {
       h("span", null, I.name + (I.acronyms.length && !fold(I.name).split(" ").includes(fold(I.acronyms[0])) ? ` (${I.acronyms[0]})` : "")),
       h("span", { class: "n" }, `${n} paper${n > 1 ? "s" : ""}`), instNote(I) ? h("span", { class: "aff" }, instNote(I)) : null))] : [];
   const instFirst = !state.qAuthor && (!!state.qInst || insts.some(x => exact(x.I)) || !authors.length);
-  box.append(...[semRows, ...(instFirst ? [iRows, aRows] : [aRows, iRows])].flat(2).filter(Boolean));
+  box.append(...(authors.length || insts.length ? [...(instFirst ? [iRows, aRows] : [aRows, iRows]), semRows] : [semRows]).flat(2).filter(Boolean));
   box.hidden = false;
 }
 function pickAuthor(A) {
@@ -2415,7 +2433,7 @@ const candidate = p => !!p.ours && (p.ours.model === "Built" || p.ours.model ===
 function tableRows(cols) {
   const get = (cols.find(c => c[0] === state.sort.col) || cols[0])[2];
   const base = state.view === "candidates" ? shown(true).filter(candidate) : shown(false);
-  if (semOn() && sem.sort) return base.sort((a, b) => byRel(a, b) || a.name.localeCompare(b.name));
+  if (semOn() && sem.sort) return base.sort((a, b) => byFound(a, b) || a.name.localeCompare(b.name));
   return base.sort((a, b) => { const x = get(a), y = get(b); return (typeof x === "number" ? x - y : String(x).localeCompare(String(y))) * state.sort.dir || a.name.localeCompare(b.name); });
 }
 function renderTable() {
@@ -2427,7 +2445,7 @@ function renderTable() {
     onclick: () => { sem.sort = false; state.sort = { col: id, dir: state.sort.col === id ? -state.sort.dir : (id === "year" || id === "cited" ? -1 : 1) }; renderTable(); } }, text)));
   const rows = tableRows(cols);
   $("#tableInfo").textContent = `${rows.length} paper${rows.length === 1 ? "" : "s"}` + (cand ? " rated A or Built" : "") + (state.q || state.pick ? (rows.length === 1 ? " matches" : " match") + " the search and selection" : "")
-    + (semOn() && sem.sort ? ", closest to the search first" : "");
+    + (semOn() && sem.sort ? (rows.some(wordHit) ? ", the words' matches first, then by meaning, closest first" : ", closest to the search first") : "");
   $("#tableEmpty").hidden = rows.length > 0;
   const T = THEME[state.theme];
   const rowFor = p => h("tr", { class: "rec", "data-key": p.key, "aria-selected": String(state.sel === "p:" + p.key), onclick: () => select("p:" + p.key) },
@@ -2943,7 +2961,7 @@ function tourSteps() {
       text: `Colour the map, the graph, the board or the timeline by modality, phenomenon group, model rating, period or role${scen}. Inside a lens, a second colour shows where two dimensions meet.` },
     { el: "#search", title: "Search",
       text: "Names, titles, authors and labels, matched from the start of a word. Type an author or an institution and pick it from the list (or click a name or an institution in a paper's drawer) to see exactly its papers; a lab counts under its university too. The papers found light up, with the citations between them, in the graph and in every lens, and only they answer the pointer until the search or the selection is cleared. Press / to jump here; Enter opens the first match." +
-        (SEMX ? " A phrase or a question, in English or in Chinese, is also searched by meaning: the 30 closest papers light up, closest first." : "") },
+        (SEMX ? " Every search of two letters or more is also a search by meaning, in English: the 30 closest papers light up beside what the words find, and the field says “by meaning”." : "") },
     { el: "#filterBtn", title: "Filters",
       text: `Narrow every view by phenomenon group, modality, scene, model rating, role, years${scen}. The button counts the active filters, and each shows as a chip in the row below, with × to remove it.` },
     demo && { el: "#right", title: "A paper's drawer", place: "left", go: () => { toMap(null); select("p:" + demo, true); },
@@ -3059,7 +3077,7 @@ function setup() {
       const i = e.key === "ArrowDown" ? (on + 1) % rows.length : (on <= 0 ? rows.length : on) - 1;
       rows.forEach((b, j) => b.classList.toggle("on", j === i));
     }
-    if (e.key === "Enter") { if (on >= 0) rows[on].click(); else { const s = shown(false), p = semOn() ? s.sort(byRel)[0] : s[0]; if (p) select("p:" + p.key, true); } }
+    if (e.key === "Enter") { if (on >= 0) rows[on].click(); else { const s = shown(false), p = semOn() ? s.sort(byFound)[0] : s[0]; if (p) select("p:" + p.key, true); } }
     if (e.key === "Escape") { q.value = ""; setQuery(""); renderSug(); refresh(); q.blur(); }
   });
   document.addEventListener("pointerdown", e => { if (!e.target.closest("#search")) $("#qsug").hidden = true; });
@@ -3105,10 +3123,10 @@ const linked = byKey.has(token) || VIEWS.some(v => v[0] === token) || token === 
 if (!linked) setTimeout(tourStart, 600);               // every visit opens with the tour, except a link to a paper, a view or the suggestion dialog
 if (token === "suggest") spOpen();                     // and one ending in #suggest with the dialog to suggest a paper
 if (SEMX) {
-  SEMX.onstate = () => { semSearch(); if (document.activeElement === $("#q")) renderSug(); };
+  SEMX.onstate = () => { semSearch(); semTag(); if (document.activeElement === $("#q")) renderSug(); };
   SEMX.init({ which: "universe", keys: P.map(p => p.key) });
   // what the site's check reads (senseweaver-models tools/semantic/ui-check.mjs): the page's code may be wrapped
-  window.S2S_UNIVERSE = { state, sem, semOn, shown, byRel, passes, visible, byKey, P, AUTHORS, setView, closeDrawer };
+  window.S2S_UNIVERSE = { state, sem, semOn, shown, byRel, byFound, wordHit, passes, visible, byKey, P, AUTHORS, setView, closeDrawer };
 }
 requestAnimationFrame(frame);
 if (location.hostname === "localhost") window.__kb = { get state() { return state; }, get view() { return view; }, get autoFit() { return autoFit; }, get trans() { return trans; },

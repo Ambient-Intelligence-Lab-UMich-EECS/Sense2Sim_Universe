@@ -6,9 +6,8 @@
 //      is worked on is replaced by the next).
 // build-index.mjs copies this file beside search.js and its modules (all renamed .js, as GitHub Pages serves them).
 import { openUniverse, openWorld, rank, queryText } from "./search.js";
-import { parseGlossary } from "./zh.js";
 
-let ix = null, G = null, ext = null, M = null, pending = null, busy = false, step = "start";
+let ix = null, ext = null, M = null, pending = null, busy = false, step = "start";
 const post = (m) => self.postMessage(m);
 // an error as text: its message, then where it was thrown (the check reads it; a reader never sees it)
 const why = (err) => `${step}: ${String((err && err.message) || err)}${err && err.stack ? " | " + String(err.stack).split("\n").slice(0, 4).join(" | ") : ""}`.slice(0, 900);
@@ -30,9 +29,8 @@ async function init({ base, manifest, which }) {
   if (!part) throw new Error(`the index has no ${which}`);
   const get = (f, how) => fetch(base + f).then((r) => { if (!r.ok) throw new Error(`${f}: ${r.status}`); return r[how](); });
   step = "index";
-  const [json, bin, gl] = await Promise.all([get(part.json, "json"), get(part.bin, "arrayBuffer"), get(M.glossary, "text")]);
+  const [json, bin] = await Promise.all([get(part.json, "json"), get(part.bin, "arrayBuffer")]);
   ix = which === "universe" ? openUniverse(json, bin) : openWorld(json, bin);
-  G = parseGlossary(gl);
   post({ type: "state", state: "words", keys: which === "universe" ? json.keys : [...new Set(json.items.map((r) => r.key))],
     spaces: which === "world" ? json.spaces : undefined, papers: which === "world" ? json.papers : undefined });
   pump();
@@ -67,7 +65,7 @@ async function pump() {
     while (pending) {
       const m = pending;
       pending = null;
-      const t0 = performance.now(), text = queryText(m.q, G);
+      const t0 = performance.now(), text = queryText(m.q);
       let qv = null;
       if (ext && text) {
         try { qv = (await ext(M.model.query + text, { pooling: M.model.pooling, normalize: true })).data; }

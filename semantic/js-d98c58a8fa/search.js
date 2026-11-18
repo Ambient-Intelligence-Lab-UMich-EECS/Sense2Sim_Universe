@@ -1,8 +1,7 @@
 // How the page ranks: the same code in the browser (site/worker.js imports it) and in Node (check-index.mjs), so the
-// test judges what the reader gets. Plain JavaScript modules only (rank.mjs, zh.mjs, vectors.mjs, texts.mjs).
+// test judges what the reader gets. Plain JavaScript modules only (rank.mjs, vectors.mjs, texts.mjs).
 
 import { bm25Texts, bm25Scores, order, rrf, RANK } from "./rank.js";
-import { translate, hasChinese } from "./zh.js";
 import { scoreRows } from "./vectors.js";
 
 // an index file pair (build-index.mjs) as the search reads it; bin: an ArrayBuffer
@@ -16,8 +15,10 @@ export function openWorld(json, bin) {
     scale: json.scale, bm: bm25Texts(json.texts) };
 }
 
-// what a query is searched as: Chinese through the glossary (G: zh.mjs parseGlossary), the rest as typed
-export const queryText = (q, G) => hasChinese(q) ? translate(q, G) : String(q).trim();
+// what a query is searched as: as typed (English only, AmI 2026-11-18: the Chinese glossary is gone; the pages do not
+// search a Chinese query by meaning)
+export const queryText = (q) => String(q).trim();
+export const hasCJK = (t) => /[\u3400-\u9fff\uf900-\ufaff]/.test(t || "");
 
 // the vectors' scores: a paper scores the nearer of its card and its abstract; a World row, its one vector
 export function vectorScores(ix, qv) {

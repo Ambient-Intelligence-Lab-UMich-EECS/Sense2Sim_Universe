@@ -1,6 +1,6 @@
 // The Sensing World page's search by meaning, as the public site adds it (after semantic/client.js; patch-world.py puts
 // both in pages/world/index.html). The World page itself is unchanged: this script adds a box beside its title; a query
-// (a phrase or a question, in English or in Chinese through the glossary) lists the papers the spaces run or place that
+// (a word, a phrase or a question, in English: AmI 2026-11-18, no Chinese) lists the papers the spaces run or place that
 // come closest, by space and room, and marks the spaces that hold them in the selector, without numbers (AmI,
 // 2026-11-17: no counts in the menus). A click, or Enter, opens the paper in its space by the page's own link
 // (#space-paperKey). Opened from the disk it adds nothing.
@@ -56,7 +56,6 @@
       if (g.rows.length < PER_SPACE) g.rows.push(h);
     }
     var head = groups.length ? "Closest first, by space: a paper opens in its space" : "No paper found";
-    if (r.text && r.text !== r.q) head += " · searched as “" + r.text + "”";
     if (!r.semantic) head += " · keywords only while the model loads";
     list.append(el("div", "hd", head));
     groups.forEach(function (g) {
@@ -79,6 +78,7 @@
   function search() {
     var q = input.value.trim(), my = ++seq;
     if (q.length < 2) { clear(); return; }
+    if (/[\u3400-\u9fff\uf900-\ufaff]/.test(q)) { last = null; mark(null); list.replaceChildren(el("div", "hd", "The search by meaning is in English")); list.hidden = false; return; }
     if (S.state !== "words" && S.state !== "ready") { list.replaceChildren(el("div", "hd", "The search is loading…")); list.hidden = false; return; }
     S.search(q).then(function (r) {
       if (!r || r.stale || my !== seq || r.q !== input.value.trim()) return;
