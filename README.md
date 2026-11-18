@@ -4,7 +4,7 @@
 
 - Sense2Sim Universe: the Sensing Universe and the Sensing World, shared by every Sense2Sim paper page
 - Sensing Universe: the SenseWeaver knowledge base, 1,401 papers and 42 considered (updated 2026-11-17); the Model rating filter starts with A and B
-- Sensing World: its spaces as of 2026-11-17, built from SenseWeaver main e1fef923 (unified/all/spaces/sim)
+- Sensing World: its spaces as of 2026-11-17, built from SenseWeaver top-down b1de8279 (unified/all/spaces/sim)
 - 3D models from the SenseWeaver asset pack (pack of 2026-11-12); credits and licences in CREDITS.md
 - The first page: a scroll-driven way into the Sensing Universe and the Sensing World (senseweaver-models tools/landing, 9836c12)
 - Packed 2026-11-17 by tools/offline.mjs (SenseWeaver claude/project-thread-pvay98, 52d85c0); the Sensing World packed again the same day (cc67d89)
